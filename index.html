@@ -773,7 +773,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
 <main class="band" id="courseView">
   <div class="top"><h1 data-i="title">가상 통일 마라톤</h1><button class="setbtn" id="setBtn" data-i="settings">설정</button></div>
   <div class="settings" id="settings"><label data-i="language">언어</label><div class="langs"><button class="langbtn" data-lang="ko">한국어</button><button class="langbtn" data-lang="ja">日本語</button></div></div>
-  <p class="lede" data-i="lede">어디서든 달리면, 달린 거리만큼 서울–평양 코스 위를 전진해요. 코스 전체는 마라톤 거리 42.195km로 줄여 놓았어요.</p>
+  <p class="lede" data-i="lede"></p>
 
   <div id="lmap" data-ia="mapAria" aria-label="마라톤 코스 지도"></div>
   <p class="adv" id="adv" aria-live="polite"></p>
@@ -805,6 +805,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
       <div><label for="selB" data-i="to">도착</label><select id="selB"></select></div>
     </div>
     <div class="pick" id="pick"></div>
+    <div class="row"><button id="defRoute" data-i="defRoute">기본 코스로</button></div>
     <div class="row"><button class="pri" id="setRoute">이 코스로 마라톤 시작</button></div>
     <div class="confirm" id="confirm2">
       <p style="margin:0 0 8px" data-i="confirmRoute">지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?</p>
@@ -859,7 +860,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
 {
 const TOTAL=42.195;
 const CITIES=[
-  ['서울','S',37.5665,126.9780],['인천','S',37.4563,126.7052],['수원','S',37.2636,127.0286],['파주','S',37.7600,126.7800],['도라산역','S',37.8995,126.7083],
+  ['서울','S',37.5665,126.9780],['인천','S',37.4563,126.7052],['수원','S',37.2636,127.0286],['파주','S',37.7600,126.7800],['도라산역','S',37.8995,126.7083],['임진각','S',37.8893,126.7406],['판문점','S',37.9556,126.6769],
   ['춘천','S',37.8813,127.7298],['속초','S',38.2070,128.5918],['강릉','S',37.7519,128.8761],['청주','S',36.6424,127.4890],
   ['대전','S',36.3504,127.3845],['전주','S',35.8242,127.1480],['광주','S',35.1595,126.8526],['목포','S',34.8118,126.3922],
   ['대구','S',35.8714,128.6014],['포항','S',36.0190,129.3435],['울산','S',35.5384,129.3114],['부산','S',35.1796,129.0756],
@@ -871,6 +872,9 @@ const CITIES=[
 const FACTS={
   '서울':['서울역 철도기점 표지판에는 평양까지 260.7km, 신의주까지 496.0km라고 적혀 있어요.','내 손안에 서울','https://mediahub.seoul.go.kr/archives/1502210'],
   '도라산역':['역에는 "남쪽의 마지막 역이 아니라 북쪽으로 가는 첫 역"이라는 표지판이 있어요.','Wikipedia, DMZ Train','https://en.wikipedia.org/wiki/DMZ_Train'],
+  '파주':['파주를 지나는 국도 1호선은 조리읍 장곡리에서 판문점까지 이어지고, 파주 구간 길이만 44.5km예요.','파주시청 도로 현황','https://www.paju.go.kr/www/www_02/housing/housing_build/housing_build_01.jsp'],
+  '임진각':['군사분계선에서 7km 떨어진 곳이에요. 언젠가 통일이 되기를 바라며 1972년에 지어졌어요.','경기도청','https://english.gg.go.kr/?p=178'],
+  '판문점':['서울에서 북쪽으로 60km, 개성에서 동쪽으로 10km 떨어진 공동경비구역(JSA)이에요. 군사분계선이 이곳을 지나요.','판문점 견학 안내','https://www.panmuntour.go.kr/nlgn/pblc/guidance/eng/panmunjomIntrcn.do'],
   '개성':['고려의 수도였던 도시예요. 평양–개성 고속도로의 남쪽 끝이 이 근처예요.','Wikipedia, 평양–개성 고속도로','https://en.wikipedia.org/wiki/Pyongyang%E2%80%93Kaesong_Motorway'],
   '사리원':['평양–개성 고속도로(총 170km)가 지나는 도시예요. 고속도로 표지판에는 서울까지의 거리가 적혀 있지만 국경은 넘을 수 없어요.','Wikipedia, 평양–개성 고속도로','https://en.wikipedia.org/wiki/Pyongyang%E2%80%93Kaesong_Motorway'],
   '평양':['2025년 4월 6일, 코로나로 중단된 지 6년 만에 평양국제마라톤이 다시 열렸어요.','서울경제, 2025.4.8','https://m.sedaily.com/article/14050492']
@@ -882,25 +886,28 @@ const hav=(a,b)=>{const r=x=>x*Math.PI/180,dl=r(b.lat-a.lat),dn=r(b.lon-a.lon);c
 const byN=n=>CITIES.find(c=>c.n===n);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const GATE_S={lat:37.9050,lon:126.6930},GATE_N={lat:37.9620,lon:126.6560};
+const GATE_S={lat:37.9550,lon:126.6772},GATE_N={lat:37.9620,lon:126.6560};
+const DEF={a:'파주',b:'개성',via:['임진각','판문점']};
 const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
 
-let st={a:'서울',b:'평양',km:0,log:[],run:null};
-try{const s=JSON.parse(localStorage.getItem('utm-v4'));if(s&&byN(s.a)&&byN(s.b)&&typeof s.km==='number')st=Object.assign(st,s)}catch(e){}
-const save=()=>{try{localStorage.setItem('utm-v4',JSON.stringify(st))}catch(e){}};
-let selA=st.a,selB=st.b,tapStep=0;
+let st={a:DEF.a,b:DEF.b,via:DEF.via.slice(),km:0,log:[],run:null};
+try{const s=JSON.parse(localStorage.getItem('utm-v5'));if(s&&byN(s.a)&&byN(s.b)&&typeof s.km==='number'){st=Object.assign(st,s);if(!Array.isArray(st.via))st.via=[]}}catch(e){}
+const save=()=>{try{localStorage.setItem('utm-v5',JSON.stringify(st))}catch(e){}};
+let selA=st.a,selB=st.b,selVia=st.via.slice(),tapStep=0;
+const names=(a,v,b)=>[a,...v,b];
+const isCur=()=>selA===st.a&&selB===st.b&&selVia.join()===st.via.join();
 
 /* 언어 설정 */
 const I18N={
 ko:{
  title:'가상 통일 마라톤',
- lede:'어디서든 달리면, 달린 거리만큼 서울–평양 코스 위를 전진해요. 코스 전체는 마라톤 거리 42.195km로 줄여 놓았어요.',
+ lede:'어디서든 달리면, 달린 거리만큼 코스 위를 전진해요. 기본 코스는 파주에서 임진각과 판문점을 지나 개성까지 가는 길이고, 코스 전체를 마라톤 거리 42.195km에 맞춰 놓았어요.',
  mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',vstart:'가상 달리기 시작',vrunning:'가상 달리기 중 · 1분 뒤 자동으로 완주해요',m_virtual:'가상 달리기',
  addRec:'기록 더하기',manualAria:'직접 입력할 거리(km)',addKm:'거리 추가',demo:'시연 모드',
  pickCourse:'코스 고르기',from:'출발',to:'도착',swapAria:'출발과 도착 바꾸기',
  setRoute:'이 코스로 마라톤 시작',curRoute:'지금 달리는 코스예요',
  confirmRoute:'지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?',change:'바꾸기',cancel:'취소',
- cardsTitle:'코스 위 도시 카드',logTitle:'달린 기록',empty:'아직 기록이 없어요.',reset:'달린 기록 초기화',
+ cardsTitle:'코스 위 도시 카드',logTitle:'달린 기록',empty:'아직 기록이 없어요.',reset:'달린 기록 초기화',defRoute:'기본 코스로 (파주 → 임진각 → 판문점 → 개성)',
  confirmReset:'달린 기록과 열린 도시 카드가 모두 지워지고, 러너가 출발점으로 돌아가요. 초기화할까요?',erase:'초기화',
  note:'지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 서버에 연결되지 않으면 Natural Earth 주요 도로 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.',
  runAria:'달리기 화면',time:'시간',pace:'페이스 (분/km)',locating:'위치를 찾는 중이에요...',
@@ -928,13 +935,13 @@ ko:{
 },
 ja:{
  title:'バーチャル統一マラソン',
- lede:'どこで走っても、走った距離だけソウル–平壌のコースを進みます。コース全体はマラソンの距離42.195kmに縮めてあります。',
+ lede:'どこで走っても、走った距離だけコースを進みます。基本コースは坡州から臨津閣と板門店を通って開城まで向かう道で、コース全体をマラソンの距離42.195kmに合わせてあります。',
  mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',vstart:'バーチャルランを開始',vrunning:'バーチャルラン中 · 1分後に自動で完走します',m_virtual:'バーチャルラン',
  addRec:'記録を追加',manualAria:'入力する距離（km）',addKm:'距離を追加',demo:'デモモード',
  pickCourse:'コースを選ぶ',from:'出発',to:'到着',swapAria:'出発と到着を入れ替える',
  setRoute:'このコースでスタート',curRoute:'現在のコースです',
  confirmRoute:'今のコースの進み具合がリセットされます。コースを変更しますか？',change:'変更する',cancel:'キャンセル',
- cardsTitle:'コース上の都市カード',logTitle:'ランニング記録',empty:'まだ記録がありません。',reset:'記録をリセット',
+ cardsTitle:'コース上の都市カード',logTitle:'ランニング記録',empty:'まだ記録がありません。',reset:'記録をリセット',defRoute:'基本コースに戻す（坡州 → 臨津閣 → 板門店 → 開城）',
  confirmReset:'ランニング記録と開いた都市カードがすべて消え、ランナーはスタート地点に戻ります。リセットしますか？',erase:'リセットする',
  note:'地図：© OpenStreetMap 寄稿者。ルート検索：OSRM公開サーバー（OpenStreetMapの道路データ）。サーバーに接続できない場合は、Natural Earthの主要道路データで作ったグラフからダイクストラ法で求めた簡易ルートを使います。軍事境界線は実際には通れないため、南北をまたぐコースは南側と北側の道を別々に探し、板門店付近を点線でつなぎます。コースから10km以内にある都市は通過する都市として表示されます。',
  runAria:'ランニング画面',time:'時間',pace:'ペース（分/km）',locating:'現在地を探しています...',
@@ -960,10 +967,13 @@ ja:{
  errLost:'GPS信号を一時的に見失いました。走り続ければ再び受信します。',
  m_manual:'手入力',m_gps:'GPS',m_demo:'デモモード',m_recover:'GPS（保存の復元）',prevRun:'前回のランニング'
 }};
-const CITY_JA={'서울':'ソウル','인천':'仁川','수원':'水原','파주':'坡州','도라산역':'都羅山駅','춘천':'春川','속초':'束草','강릉':'江陵','청주':'清州','대전':'大田','전주':'全州','광주':'光州','목포':'木浦','대구':'大邱','포항':'浦項','울산':'蔚山','부산':'釜山','제주':'済州','개성':'開城','해주':'海州','사리원':'沙里院','남포':'南浦','평양':'平壌','원산':'元山','함흥':'咸興','신의주':'新義州','강계':'江界','혜산':'恵山','청진':'清津','나선':'羅先'};
+const CITY_JA={'서울':'ソウル','인천':'仁川','수원':'水原','파주':'坡州','도라산역':'都羅山駅','임진각':'臨津閣','판문점':'板門店','춘천':'春川','속초':'束草','강릉':'江陵','청주':'清州','대전':'大田','전주':'全州','광주':'光州','목포':'木浦','대구':'大邱','포항':'浦項','울산':'蔚山','부산':'釜山','제주':'済州','개성':'開城','해주':'海州','사리원':'沙里院','남포':'南浦','평양':'平壌','원산':'元山','함흥':'咸興','신의주':'新義州','강계':'江界','혜산':'恵山','청진':'清津','나선':'羅先'};
 const FACTS_JA={
  '서울':['ソウル駅の鉄道起点標識には、平壌まで260.7km、新義州まで496.0kmと書かれています。','ソウル市「내 손안에 서울」'],
  '도라산역':['駅には「南の最後の駅ではなく、北へ向かう最初の駅」という標識があります。','Wikipedia, DMZ Train'],
+ '파주':['坡州を通る国道1号線は助里邑長谷里から板門店まで続き、坡州区間だけで44.5kmあります。','坡州市 道路現況'],
+ '임진각':['軍事境界線から7kmの場所にあります。いつか統一されることを願って1972年に建てられました。','京畿道庁'],
+ '판문점':['ソウルから北へ60km、開城から東へ10kmの共同警備区域（JSA）です。軍事境界線がここを通っています。','板門店見学案内'],
  '개성':['高麗の都だった都市です。平壌–開城高速道路の南端はこの近くです。','Wikipedia, 平壌–開城高速道路'],
  '사리원':['平壌–開城高速道路（全長170km）が通る都市です。高速道路の標識にはソウルまでの距離が書かれていますが、境界を越えることはできません。','Wikipedia, 平壌–開城高速道路'],
  '평양':['2025年4月6日、コロナで中断されてから6年ぶりに平壌国際マラソンが再開されました。','ソウル経済（서울경제）, 2025.4.8']
@@ -992,6 +1002,7 @@ function dijkstra(s,t){
   const path=[];for(let u=t;u!==-1;u=prev[u])path.unshift(u);return path;
 }
 function graphLeg(a,b){const [na]=nearest(a),[nb]=nearest(b);return[a,...dijkstra(na,nb).map(i=>NN[i]),b]}
+function safeLeg(a,b){const g=graphLeg(a,b);let len=0;for(let i=1;i<g.length;i++)len+=hav(g[i-1],g[i]);const d=hav(a,b);return d<25&&len>1.3*d+1?[a,b]:g}
 
 /* 실제 길 찾기 (OSRM) */
 let osrmOK=null;
@@ -1004,33 +1015,49 @@ async function osrmLeg(a,b){
   }catch(e){clearTimeout(t);return null}
 }
 
-function build(A,B,legs,src){
+function build(names,legs,src){
+  const A=byN(names[0]),B=byN(names[names.length-1]);
   const geo=[],gap=[];
-  legs.forEach((leg,i)=>{if(i>0)gap.push(geo.length-1);geo.push(...leg)});
+  legs.forEach(l=>{if(l.gap&&geo.length)gap.push(geo.length-1);geo.push(...l.pts)});
   const cum=[0];for(let i=1;i<geo.length;i++)cum.push(cum[i-1]+hav(geo[i-1],geo[i]));
   const D=cum[cum.length-1];
   const stops=CITIES.map(c=>{
     if(c===A)return{c,f:0};if(c===B)return{c,f:1};
+    if(names.includes(c.n)){const ix=geo.indexOf(c);if(ix>0)return{c,f:cum[ix]/D}}
     let bd=1e9,bi=0;for(let i=0;i<geo.length;i+=Math.max(1,Math.floor(geo.length/1500))){const d=hav(geo[i],c);if(d<bd){bd=d;bi=i}}
-    return bd<=10&&bi>0&&bi<geo.length-1?{c,f:cum[bi]/D}:null;
+    return bd<=(names.includes(c.n)?3:10)&&bi>0&&bi<geo.length-1?{c,f:cum[bi]/D}:null;
   }).filter(Boolean).sort((x,y)=>x.f-y.f).map(s=>({...s,km:s.f*TOTAL,real:s.f*D}));
   const crossF=gap.length?cum[gap[0]]/D:null;
-  return{A,B,geo,cum,D,straight:hav(A,B),stops,cross:crossF,gap,src,scale:D/TOTAL};
+  return{A,B,names,geo,cum,D,straight:hav(A,B),stops,cross:crossF,gap,src,scale:D/TOTAL};
+}
+function plan(names){
+  const P=names.map(byN),out=[];
+  for(let i=0;i<P.length-1;i++){
+    const a=P[i],b=P[i+1];
+    if(a.side!==b.side){const ga=a.side==='S'?GATE_S:GATE_N,gb=b.side==='S'?GATE_S:GATE_N;out.push({p:a,q:ga,gap:false},{p:gb,q:b,gap:true})}
+    else out.push({p:a,q:b,gap:false});
+  }
+  return out;
 }
 const cache={};
-function quickCourse(a,b){
-  const A=byN(a),B=byN(b),k=a+'>'+b;if(cache[k])return cache[k];
-  const legs=A.side!==B.side?(A.side==='S'?[graphLeg(A,GATE_S),graphLeg(GATE_N,B)]:[graphLeg(A,GATE_N),graphLeg(GATE_S,B)]):[graphLeg(A,B)];
-  return build(A,B,legs,'graph');
+const ckey=names=>names.join('>');
+function quickCourse(names){
+  const k=ckey(names);if(cache[k])return cache[k];
+  const legs=plan(names).map(l=>({gap:l.gap,pts:hav(l.p,l.q)<0.3?[l.p,l.q]:safeLeg(l.p,l.q)}));
+  return build(names,legs,'graph');
 }
-async function realCourse(a,b){
-  const A=byN(a),B=byN(b),k=a+'>'+b;if(cache[k])return cache[k];
+async function realCourse(names){
+  const k=ckey(names);if(cache[k]&&cache[k].src==='osrm')return cache[k];
   if(osrmOK===false)return null;
-  const pairs=A.side!==B.side?(A.side==='S'?[[A,GATE_S],[GATE_N,B]]:[[A,GATE_N],[GATE_S,B]]):[[A,B]];
-  const legs=[];
-  for(const [p,q] of pairs){const l=await osrmLeg(p,q);if(!l){if(osrmOK===null)osrmOK=false;return null}legs.push([p,...l,q])}
-  osrmOK=true;
-  return cache[k]=build(A,B,legs,'osrm');
+  const legs=[];let all=true;
+  for(const l of plan(names)){
+    if(hav(l.p,l.q)<0.3){legs.push({gap:l.gap,pts:[l.p,l.q]});continue}
+    let r=await osrmLeg(l.p,l.q);
+    if(r){let len=0;for(let i=1;i<r.length;i++)len+=hav(r[i-1],r[i]);if(len>3*hav(l.p,l.q)+8)r=null}
+    if(!r){if(osrmOK===null&&!legs.length){osrmOK=false;return null}all=false;legs.push({gap:l.gap,pts:safeLeg(l.p,l.q)});continue}
+    osrmOK=true;legs.push({gap:l.gap,pts:[l.p,...r,l.q]});
+  }
+  return cache[k]=build(names,legs,all?'osrm':'mixed');
 }
 function at(R,f){
   const t=f*R.D,c=R.cum;let lo=1,hi=c.length-1;
@@ -1080,7 +1107,7 @@ const routeDone=L.polyline([],{color:'#e5483b',weight:6}).addTo(map);
 const runner=L.circleMarker([0,0],{radius:9,color:'#fff',weight:3,fillColor:'#e5483b',fillOpacity:1}).addTo(map);
 const cityLayer=L.layerGroup().addTo(map);
 
-let C=quickCourse(st.a,st.b),P=C,shown=st.km;
+let C=quickCourse(names(st.a,st.via,st.b)),P=C,shown=st.km;
 function fillOpts(){const opts=CITIES.map(c=>`<option value="${esc(c.n)}">${esc(cn(c.n))} (${t(c.side)})</option>`).join('');$('selA').innerHTML=opts;$('selB').innerHTML=opts}
 fillOpts();
 
@@ -1102,41 +1129,42 @@ function drawRoute(){
   routeGap.setLatLngs(gaps);
   routeDone.setStyle({opacity:preview?0:1});runner.setStyle({opacity:preview?0:1,fillOpacity:preview?0:1});
 }
-function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{paddingTopLeft:[58,24],paddingBottomRight:[64,24]})}
+function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{paddingTopLeft:[72,40],paddingBottomRight:[64,28]})}
 window.addEventListener('resize',()=>{clearTimeout(fitRoute.t);fitRoute.t=setTimeout(fitRoute,200)});
 
 function updatePick(){
   $('selA').value=selA;$('selB').value=selB;
   if(selA===selB){$('pick').innerHTML=`<span class="status err">${esc(t('pickErr'))}</span>`;return}
-  $('pick').innerHTML=`<label>${esc(cn(selA))} → ${esc(cn(selB))} ${t(P.src==='osrm'?'realDist':'quickDist')}</label><b>${P.D.toFixed(1)} km</b><div class="note">${esc(t('pickNote',{s:P.straight.toFixed(1),k:P.scale.toFixed(1)}))}${P.cross!==null?esc(t('dmzNote')):''}</div>`;
-  $('setRoute').textContent=t((selA===st.a&&selB===st.b)?'curRoute':'setRoute');
+  $('pick').innerHTML=`<label>${names(selA,selVia,selB).map(n=>esc(cn(n))).join(' → ')} · ${t(P.src==='osrm'?'realDist':'quickDist')}</label><b>${P.D.toFixed(1)} km</b><div class="note">${esc(t('pickNote',{s:P.straight.toFixed(1),k:P.scale.toFixed(1)}))}${P.cross!==null?esc(t('dmzNote')):''}</div>`;
+  $('setRoute').textContent=t(isCur()?'curRoute':'setRoute');
 }
 let reqId=0;
 async function preview(){
   if(selA===selB){updatePick();return}
   const id=++reqId;
-  P=(selA===st.a&&selB===st.b)?C:quickCourse(selA,selB);
+  P=isCur()?C:quickCourse(names(selA,selVia,selB));
   drawRoute();drawCities();updatePick();fitRoute();
-  const R=await realCourse(selA,selB);
+  const R=await realCourse(names(selA,selVia,selB));
   if(id!==reqId||!R)return;
-  if(selA===st.a&&selB===st.b){C=R;P=C}else P=R;
+  if(isCur()){C=R;P=C}else P=R;
   drawRoute();drawCities();updatePick();paint(shown);fitRoute();
 }
 function pickCity(n){
-  if(tapStep===0){selA=n;tapStep=1;$('adv').textContent=t('tapFrom',{c:cn(n)});updatePick();drawCities()}
+  if(tapStep===0){selA=n;selVia=[];tapStep=1;$('adv').textContent=t('tapFrom',{c:cn(n)});updatePick();drawCities()}
   else{if(n===selA)return;selB=n;tapStep=0;$('adv').textContent='';preview()}
 }
-$('selA').addEventListener('change',e=>{selA=e.target.value;tapStep=0;preview()});
-$('selB').addEventListener('change',e=>{selB=e.target.value;tapStep=0;preview()});
-$('swap').addEventListener('click',()=>{[selA,selB]=[selB,selA];preview()});
+$('selA').addEventListener('change',e=>{selA=e.target.value;selVia=[];tapStep=0;preview()});
+$('selB').addEventListener('change',e=>{selB=e.target.value;selVia=[];tapStep=0;preview()});
+$('defRoute').addEventListener('click',()=>{selA=DEF.a;selB=DEF.b;selVia=DEF.via.slice();tapStep=0;preview()});
+$('swap').addEventListener('click',()=>{[selA,selB]=[selB,selA];selVia=selVia.slice().reverse();preview()});
 function applyRoute(){
-  st={a:selA,b:selB,km:0,log:[],run:null};C=P;shown=0;save();
+  st={a:selA,b:selB,via:selVia.slice(),km:0,log:[],run:null};C=P;shown=0;save();
   drawRoute();drawCities();updatePick();paint(0);renderLists();fitRoute();
   $('newcard').classList.remove('show');$('adv').textContent=t('changed',{a:cn(selA),b:cn(selB)});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $('setRoute').addEventListener('click',()=>{
-  if(selA===selB||(selA===st.a&&selB===st.b))return;
+  if(selA===selB||isCur())return;
   if(st.km>0)$('confirm2').classList.add('show');else applyRoute();
 });
 $('yes2').addEventListener('click',()=>{$('confirm2').classList.remove('show');applyRoute()});
@@ -1336,7 +1364,7 @@ document.querySelectorAll('.langbtn').forEach(b=>b.addEventListener('click',()=>
 applyStatic();
 if(st.run&&st.run.m>=10){const k=st.run.m/1000;st.run=null;st.km=Math.min(TOTAL,st.km+k);st.log.push({ts:Date.now(),m:'recover',km:k});save();shown=st.km}
 drawRoute();drawCities();updatePick();paint(shown);renderLists();fitRoute();
-realCourse(st.a,st.b).then(R=>{if(R&&selA===st.a&&selB===st.b){C=R;P=C;drawRoute();drawCities();updatePick();paint(shown);renderLists();fitRoute()}});
+realCourse(names(st.a,st.via,st.b)).then(R=>{if(R&&isCur()){C=R;P=C;drawRoute();drawCities();updatePick();paint(shown);renderLists();fitRoute()}});
 }
 </script>
 </body>
