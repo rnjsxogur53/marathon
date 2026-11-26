@@ -686,6 +686,8 @@ h2{font-size:18px;margin:0 0 12px}
 #lmap{height:min(58vh,520px);border-radius:18px;border:1px solid var(--line);background:#cfe5f7}
 .leaflet-tooltip.lab{background:rgba(255,255,255,.9);border:0;box-shadow:none;padding:0 5px;font:700 13px "Noto Sans KR",sans-serif;color:#14181d}
 .leaflet-tooltip.lab:before{display:none}
+.leaflet-touch .leaflet-bar a{width:40px;height:40px;line-height:40px;font-size:20px}
+.leaflet-bar a.wholebtn{width:auto!important;min-width:40px;padding:0 10px;font:500 14px "Noto Sans KR","Noto Sans JP",sans-serif;color:#14181d;line-height:40px;height:40px}
 .leaflet-container .leaflet-control-attribution{background:transparent;font-size:10px;line-height:1.2;padding:0 4px;opacity:.65;box-shadow:none}
 .leaflet-control-attribution a{color:#14181d}
 .adv{text-align:center;color:var(--run);font-weight:500;margin:10px 0 0;min-height:1.6em}
@@ -898,7 +900,7 @@ ko:{
  meOpen:'내 위치 지도 보기',meClose:'내 위치 지도 닫기',meAria:'내 위치와 뛴 길 지도',
  confirmEnd:'이번 달리기를 끝내고 기록을 저장할까요?',keepRun:'계속 달리기',saveEnd:'저장하고 끝내기',
  pause:'일시정지',resume:'다시 달리기',end:'끝내기',
- settings:'설정',language:'언어',
+ settings:'설정',language:'언어',whole:'전체',zoomIn:'확대',zoomOut:'축소',
  S:'남',N:'북',Sfull:'남한',Nfull:'북한',
  until:'{c}까지',finished:'완주',congrats:'축하해요!',
  pickErr:'출발과 도착은 다른 도시여야 해요.',realDist:'실제 도로 거리',quickDist:'간이 도로 거리',
@@ -932,7 +934,7 @@ ja:{
  meOpen:'現在地の地図を見る',meClose:'現在地の地図を閉じる',meAria:'現在地と走った道の地図',
  confirmEnd:'ランニングを終了して記録を保存しますか？',keepRun:'走り続ける',saveEnd:'保存して終了',
  pause:'一時停止',resume:'再開',end:'終了',
- settings:'設定',language:'言語',
+ settings:'設定',language:'言語',whole:'全体',zoomIn:'拡大',zoomOut:'縮小',
  S:'南',N:'北',Sfull:'韓国',Nfull:'北朝鮮',
  until:'{c}まで',finished:'完走',congrats:'おめでとう！',
  pickErr:'出発地と到着地は別の都市にしてください。',realDist:'実際の道路距離',quickDist:'簡易道路距離',
@@ -1034,8 +1036,12 @@ function at(R,f){
 
 
 /* 코스 지도 (하나뿐) */
-const map=L.map('lmap',{zoomControl:false,attributionControl:true,preferCanvas:true,dragging:!TOUCH,scrollWheelZoom:false,doubleClickZoom:false}).setView([38.2,127.3],6);
+const map=L.map('lmap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH,scrollWheelZoom:false,doubleClickZoom:true,touchZoom:true}).setView([38.2,127.3],6);
 map.attributionControl.setPrefix(false);
+const WholeCtl=L.Control.extend({options:{position:'topleft'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar');const a=L.DomUtil.create('a','wholebtn',d);a.href='#';a.id='wholeBtn';a.setAttribute('role','button');a.textContent=t('whole');a.title=t('whole');L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);fitRoute()});L.DomEvent.disableClickPropagation(d);return d}});
+new WholeCtl().addTo(map);
+map.zoomControl.getContainer().querySelector('.leaflet-control-zoom-in').title=t('zoomIn');
+map.zoomControl.getContainer().querySelector('.leaflet-control-zoom-out').title=t('zoomOut');
 map.createPane('base');map.getPane('base').style.zIndex=150;
 const ll=p=>[p.lat,p.lon];
 ['S','N'].forEach(k=>OUT[k].forEach(r=>L.polygon(r.map(([x,y])=>[y,x]),{pane:'base',color:'#ffffff',weight:1,fillColor:'#9fcaf0',fillOpacity:1}).addTo(map)));
@@ -1258,7 +1264,7 @@ function setI(id,k){const el=$(id);el.dataset.i=k;el.textContent=t(k)}
 $('setBtn').addEventListener('click',()=>$('settings').classList.toggle('show'));
 document.querySelectorAll('.langbtn').forEach(b=>b.addEventListener('click',()=>{
   lang=b.dataset.lang;try{localStorage.setItem('utm-lang',lang)}catch(e){}
-  applyStatic();fillOpts();drawCities();updatePick();paint(shown);renderLists();
+  applyStatic();fillOpts();const wb=$('wholeBtn');if(wb){wb.textContent=t('whole');wb.title=t('whole')}drawCities();updatePick();paint(shown);renderLists();
   $('newcard').classList.remove('show');$('adv').textContent='';$('settings').classList.remove('show');
 }));
 /* 시작 */
