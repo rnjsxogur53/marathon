@@ -710,6 +710,13 @@ button{padding:0 18px;background:var(--card);cursor:pointer}
 select,input{padding:0 12px;background:var(--bg);width:100%}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .go{background:var(--run);border-color:var(--run);color:#fff;width:100%;font-size:19px;min-height:56px;margin-top:14px}
+.gorow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.gorow .go{margin-top:0;font-size:18px;padding:0 8px}
+.teamgo{background:var(--sky);border-color:var(--sky)}
+.pfm{display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.pf{width:38px;height:38px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.pf svg{width:30px;height:30px;display:block}
+.pfn{margin-top:2px;background:#fff;color:#14181d;font:700 12px/1.5 "Noto Sans KR","Noto Sans JP",sans-serif;padding:0 6px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .go2{background:transparent;border:1.5px solid var(--run);color:var(--run);width:100%;font-size:17px;min-height:52px;margin-top:10px}
 .resetbtn{border-color:var(--run);color:var(--run);background:transparent}
 .pri{background:var(--sky);border-color:var(--sky);color:#fff}
@@ -771,7 +778,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
 </head>
 <body>
 <main class="band" id="courseView">
-  <div class="top"><h1 data-i="title">가상 통일 마라톤</h1><button class="setbtn" id="setBtn" data-i="settings">언어</button></div>
+  <div class="top"><h1 data-i="title">가상 통일 마라톤</h1><button class="setbtn" id="setBtn" data-i="settings">설정</button></div>
   <div class="settings" id="settings"><label data-i="language">언어</label><div class="langs"><button class="langbtn" data-lang="ko">한국어</button><button class="langbtn" data-lang="ja">日本語</button></div></div>
   <p class="lede" data-i="lede"></p>
 
@@ -784,7 +791,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
     <div class="stat"><span id="sNextL">다음 도시까지</span><b id="sNext">-</b></div>
   </div>
   <div class="bar" aria-hidden="true"><i id="bar"></i></div>
-  <button class="go" id="startBtn" data-i="start">달리기 시작</button>
+  <div class="gorow"><button class="go" id="startBtn" data-i="start">달리기 시작</button><button class="go teamgo" id="teamBtn" data-i="together">같이 달리기</button></div>
   <button class="go2" id="vStartBtn" data-i="vstart">가상 달리기 시작</button>
   <p class="status" id="status" aria-live="polite"></p>
 
@@ -902,7 +909,7 @@ const I18N={
 ko:{
  title:'가상 통일 마라톤',
  lede:'어디서든 달리면, 달린 거리만큼 코스 위를 전진해요. 기본 코스는 파주에서 임진각과 판문점을 지나 개성까지 가는 길이고, 코스 전체를 마라톤 거리 42.195km에 맞춰 놓았어요.',
- mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',vstart:'가상 달리기 시작',vrunning:'가상 달리기 중 · 1분 뒤 자동으로 완주해요',m_virtual:'가상 달리기',
+ mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',vstart:'가상 달리기 시작',together:'같이 달리기',trunning:'같이 달리기 중 · 1분 뒤 자동으로 완주해요',m_together:'같이 달리기',pJP:'일본',pSK:'남한',pNK:'북한',vrunning:'가상 달리기 중 · 1분 뒤 자동으로 완주해요',m_virtual:'가상 달리기',
  addRec:'기록 더하기',manualAria:'직접 입력할 거리(km)',addKm:'거리 추가',demo:'시연 모드',
  pickCourse:'코스 고르기',from:'출발',to:'도착',swapAria:'출발과 도착 바꾸기',
  setRoute:'이 코스로 마라톤 시작',curRoute:'지금 달리는 코스예요',
@@ -914,7 +921,7 @@ ko:{
  meOpen:'내 위치 지도 보기',meClose:'내 위치 지도 닫기',meAria:'내 위치와 뛴 길 지도',
  confirmEnd:'이번 달리기를 끝내고 기록을 저장할까요?',keepRun:'계속 달리기',saveEnd:'저장하고 끝내기',
  pause:'일시정지',resume:'다시 달리기',end:'끝내기',
- settings:'언어',language:'언어',whole:'전체',zoomIn:'확대',zoomOut:'축소',
+ settings:'설정',language:'언어',whole:'전체',zoomIn:'확대',zoomOut:'축소',
  S:'남',N:'북',Sfull:'남한',Nfull:'북한',
  until:'{c}까지',finished:'완주',congrats:'축하해요!',
  pickErr:'출발과 도착은 다른 도시여야 해요.',realDist:'실제 도로 거리',quickDist:'간이 도로 거리',
@@ -936,7 +943,7 @@ ko:{
 ja:{
  title:'バーチャル統一マラソン',
  lede:'どこで走っても、走った距離だけコースを進みます。基本コースは坡州から臨津閣と板門店を通って開城まで向かう道で、コース全体をマラソンの距離42.195kmに合わせてあります。',
- mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',vstart:'バーチャルランを開始',vrunning:'バーチャルラン中 · 1分後に自動で完走します',m_virtual:'バーチャルラン',
+ mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',vstart:'バーチャルランを開始',together:'みんなで走る',trunning:'みんなで走っています · 1分後に自動で完走します',m_together:'みんなで走る',pJP:'日本',pSK:'韓国',pNK:'北朝鮮',vrunning:'バーチャルラン中 · 1分後に自動で完走します',m_virtual:'バーチャルラン',
  addRec:'記録を追加',manualAria:'入力する距離（km）',addKm:'距離を追加',demo:'デモモード',
  pickCourse:'コースを選ぶ',from:'出発',to:'到着',swapAria:'出発と到着を入れ替える',
  setRoute:'このコースでスタート',curRoute:'現在のコースです',
@@ -1247,7 +1254,10 @@ const locErr=err=>err.code===1?t(location.protocol!=='https:'||window.self!==win
 const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
 function elapsed(){return run?run.acc+(run.paused?0:(Date.now()-run.t0)/1000):0}
 const VDUR=60,VPACE=330;
-let vMap=null,vBase,vGap,vDone,vRunner,vCities;
+let vMap=null,vBase,vGap,vDone,vRunner,vCities,vTeam;
+const TEAM=[{k:'pJP',c:'#7c5cd6',off:0.08,dx:-46},{k:'pSK',c:'#2f7fe0',off:0,dx:0},{k:'pNK',c:'#12a39a',off:-0.08,dx:46}];
+const PERSON='<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="11" r="6" fill="#fff"/><path d="M3 31c0-7 5.4-11 12-11s12 4 12 11z" fill="#fff"/></svg>';
+function teamIcon(m){return L.divIcon({className:'',html:`<div class="pfm"><div class="pf" style="--c:${m.c}">${PERSON}</div><div class="pfn">${esc(t(m.k))}</div></div>`,iconSize:[70,62],iconAnchor:[35-m.dx,20]})}
 function setupVMap(){
   if(!vMap){
     vMap=L.map('vMap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH,touchZoom:true,scrollWheelZoom:false});
@@ -1258,18 +1268,23 @@ function setupVMap(){
     vDone=L.polyline([],{color:'#e5483b',weight:6}).addTo(vMap);
     vCities=L.layerGroup().addTo(vMap);
     vRunner=L.circleMarker([0,0],{radius:9,color:'#fff',weight:3,fillColor:'#e5483b',fillOpacity:1}).addTo(vMap);
+    vTeam=TEAM.map(m=>L.marker([0,0],{icon:teamIcon(m),interactive:false,keyboard:false}));
   }
+  const tog=!!(run&&run.together);
+  vTeam.forEach((mk,i)=>{mk.setIcon(teamIcon(TEAM[i]));if(tog)mk.addTo(vMap);else mk.remove()});
+  vRunner.setStyle({opacity:tog?0:1,fillOpacity:tog?0:1});
   vCities.clearLayers();
   C.stops.forEach(s=>vCities.addLayer(L.circleMarker([s.c.lat,s.c.lon],{radius:6,color:'#14181d',weight:2,fillColor:'#ffffff',fillOpacity:1}).bindTooltip(cn(s.c.n),{permanent:true,direction:'right',offset:[8,0],className:'lab'})));
   const gapAt=new Set(C.gap),segs=[[]],gaps=[];
   C.geo.forEach((p,i)=>{segs[segs.length-1].push(ll(p));if(gapAt.has(i)){gaps.push([ll(p),ll(C.geo[i+1])]);segs.push([])}});
   vBase.setLatLngs(segs);vGap.setLatLngs(gaps);
-  vMap.setView(ll(at(C,Math.min(TOTAL,st.km)/TOTAL)),10,{animate:false});
+  vMap.setView(ll(at(C,Math.min(TOTAL,st.km)/TOTAL)),tog?13:10,{animate:false});
 }
 function paintVMap(km){
   if(!vMap)return;
   const p=at(C,Math.min(TOTAL,km)/TOTAL),d=C.geo.slice(0,p.i).map(ll);d.push(ll(p));
   vRunner.setLatLng(ll(p));vDone.setLatLngs(d);vMap.panTo(ll(p),{animate:false});
+  if(run&&run.together)vTeam.forEach((mk,i)=>mk.setLatLng(ll(at(C,Math.max(0,Math.min(TOTAL,km+TEAM[i].off))/TOTAL))));
 }
 function paintRun(){
   if(run.virtual){run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);paintVMap(st.km+run.m/1000)}
@@ -1302,14 +1317,14 @@ function startWatch(){
     $('rStatus').textContent=locErr(err);$('rStatus').className='rstatus'+(err.code===1?' err':'');
   },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
 }
-function openRun(virtual,goal){
-  run={m:0,acc:0,t0:Date.now(),paused:false,track:[],virtual,goal:goal||0};last=null;
+function openRun(virtual,goal,together){
+  run={m:0,acc:0,t0:Date.now(),paused:false,track:[],virtual,goal:goal||0,together:!!together};last=null;
   $('runView').classList.add('show');document.body.style.overflow='hidden';
   $('meBtn').style.display=virtual?'none':'';$('vMap').classList.toggle('show',!!virtual);$('meMap').classList.toggle('show',false);setI('meBtn','meOpen');
   setI('pauseBtn','pause');$('endc').classList.remove('show');
   $('rStatus').textContent=t('locating');$('rStatus').className='rstatus';
   if(meTrack)meTrack.setLatLngs([]);
-  if(virtual){setupVMap();setTimeout(()=>{vMap.invalidateSize();vMap.setView(ll(at(C,st.km/TOTAL)),10,{animate:false})},30);$('rStatus').textContent=t('vrunning');paintRun();wake();tick=setInterval(()=>{if(run&&!run.paused)paintRun()},100);return}
+  if(virtual){setupVMap();setTimeout(()=>{vMap.invalidateSize();vMap.setView(ll(at(C,st.km/TOTAL)),together?13:10,{animate:false});paintVMap(st.km+run.m/1000)},30);$('rStatus').textContent=t(together?'trunning':'vrunning');paintRun();wake();tick=setInterval(()=>{if(run&&!run.paused)paintRun()},100);return}
   paintRun();wake();startWatch();
   tick=setInterval(()=>{if(run&&!run.paused)paintRun()},1000);
 }
@@ -1318,6 +1333,11 @@ $('vStartBtn').addEventListener('click',()=>{
   if(anim){cancelAnimationFrame(anim);anim=null;shown=st.km;paint(st.km);renderLists()}
   if(st.km>=TOTAL-1e-6){st.km=0;shown=0;paint(0);renderLists();$('newcard').classList.remove('show')}
   openRun(true,TOTAL-st.km);
+});
+$('teamBtn').addEventListener('click',()=>{
+  if(anim){cancelAnimationFrame(anim);anim=null;shown=st.km;paint(st.km);renderLists()}
+  if(st.km>=TOTAL-1e-6){st.km=0;shown=0;paint(0);renderLists();$('newcard').classList.remove('show')}
+  openRun(true,TOTAL-st.km,true);
 });
 $('pauseBtn').addEventListener('click',()=>{
   if(!run)return;
@@ -1331,11 +1351,11 @@ function finishRun(){
   if(!run)return;
   if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(tick);
   try{lock&&lock.release()}catch(e){}lock=null;
-  const virtual=run.virtual;if(virtual)run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);
+  const virtual=run.virtual,together=run.together;if(virtual)run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);
   const km=run.m/1000;run=null;st.run=null;save();$('endc').classList.remove('show');
   $('runView').classList.remove('show');document.body.style.overflow='';
   window.scrollTo({top:0});
-  setTimeout(()=>{map.invalidateSize();if(km>=0.01)advance(km,virtual?'virtual':'gps');else{$('adv').textContent=t('tooShort');fitRoute()}},250);
+  setTimeout(()=>{map.invalidateSize();if(km>=0.01)advance(km,together?'together':virtual?'virtual':'gps');else{$('adv').textContent=t('tooShort');fitRoute()}},250);
 }
 $('meBtn').addEventListener('click',()=>{
   const box=$('meMap'),open=!box.classList.contains('show');
