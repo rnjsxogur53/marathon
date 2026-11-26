@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>가상 통일 마라톤</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>/* required styles */
 
 .leaflet-pane,
@@ -670,56 +670,54 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </style>
 <style>
 /* VOICE: 밝고 힘찬 레이스 앱, 짧은 말
-   IDEA: 한반도기 — 실제 거리 지도 위에 내가 고른 두 도시를 잇는 코스
-   PICTURE: 동네 길까지 보이는 실제 지도, 빨간 코스 선과 달리는 점
+   IDEA: 한반도기 — 코스 지도 하나, 달릴 때는 숫자만 크게
+   PICTURE: 실제 지도 위 서울-평양 코스와 빨간 러너 / 어두운 바탕의 큰 거리 숫자
    COLOUR and TYPE: 흰 바탕, 한반도기 하늘색, 러너 빨강 / Black Han Sans 숫자, Noto Sans KR 본문
-   LAYOUT: 모바일 한 열, 넓으면 지도와 조작부 2열 */
+   LAYOUT: 두 화면 — 코스 화면(한 열), 달리기 화면(전체 화면) */
 :root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e151d);--ink:light-dark(#14181d,#e8eef5);--sub:light-dark(#5b6570,#9aa7b4);--line:light-dark(#e3e8ee,#243140);--sky:light-dark(#4f9be0,#5aa6e8);--skybg:light-dark(#f2f8fe,#111d29);--run:#e5483b;--card:light-dark(#f6f9fc,#141f2b)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans KR",system-ui,sans-serif;overflow-x:clip}
-.band{padding:clamp(20px,4vw,48px) max(5vw,16px);max-width:1240px;margin:0 auto}
-h1{font:400 clamp(30px,6vw,48px)/1.05 "Black Han Sans",sans-serif;margin:0 0 6px;text-wrap:balance}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans KR","Noto Sans JP",system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(18px,4vw,40px) max(5vw,16px);max-width:760px;margin:0 auto}
+h1{font:400 clamp(30px,6vw,44px)/1.05 "Black Han Sans","Noto Sans JP",sans-serif;margin:0 0 6px}
 h2{font-size:18px;margin:0 0 12px}
-.lede{color:var(--sub);margin:0 0 18px}
-.grid{display:grid;gap:20px}
-@media(min-width:900px){.grid{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}}
-.mapwrap{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line)}
-#lmap{height:min(72vh,620px);background:#cfe5f7}
-.mapctl{position:absolute;right:10px;top:10px;z-index:1000;display:flex;gap:6px}
-.mapctl button{min-height:44px;padding:0 14px;background:#fff;color:#14181d;font-size:15px;border:1px solid #cfd6de}
-.mapctl button.on{background:#14181d;color:#fff;border-color:#14181d}
-.hint{position:absolute;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;background:rgba(20,24,29,.45);color:#fff;font-size:17px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none}
-.hint.show{opacity:1}
-.mapinfo{position:absolute;left:10px;bottom:22px;z-index:1000;font-size:13px;background:rgba(255,255,255,.92);color:#14181d;padding:4px 10px;border-radius:8px;max-width:calc(100% - 20px)}
+.lede{color:var(--sub);margin:0 0 16px}
+.num{font-family:"Black Han Sans","Noto Sans JP",sans-serif;font-weight:400}
+#lmap{height:min(58vh,520px);border-radius:18px;border:1px solid var(--line);background:#cfe5f7}
 .leaflet-tooltip.lab{background:rgba(255,255,255,.9);border:0;box-shadow:none;padding:0 5px;font:700 13px "Noto Sans KR",sans-serif;color:#14181d}
 .leaflet-tooltip.lab:before{display:none}
 .leaflet-container .leaflet-control-attribution{background:transparent;font-size:10px;line-height:1.2;padding:0 4px;opacity:.65;box-shadow:none}
 .leaflet-control-attribution a{color:#14181d}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.adv{text-align:center;color:var(--run);font-weight:500;margin:10px 0 0;min-height:1.6em}
+.newcard{display:none;margin-top:10px;border:1.5px solid var(--sky);border-radius:14px;padding:12px 14px}
+.newcard.show{display:block}
+.newcard small{color:var(--sky);font-size:13px}
+.newcard b{display:block;font-size:17px}
+.newcard p{margin:2px 0 0;font-size:15px}
+.newcard a{font-size:13px;color:var(--sky)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 10px}
 .stat{background:var(--card);border-radius:12px;padding:10px 12px}
-.stat b{display:block;font:400 22px/1.2 "Black Han Sans",sans-serif;white-space:nowrap}
+.stat b{display:block;font:400 22px/1.2 "Black Han Sans","Noto Sans JP",sans-serif;white-space:nowrap}
 .stat span{font-size:13px;color:var(--sub)}
 .bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--run);width:0;transition:width .4s}
-.panel{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
-button,select,input{font:500 16px "Noto Sans KR",sans-serif;min-height:48px;border-radius:12px;border:1px solid var(--line);color:var(--ink)}
+.bar i{display:block;height:100%;background:var(--run);width:0}
+.panel{border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px}
+button,select,input{font:500 16px "Noto Sans KR","Noto Sans JP",sans-serif;min-height:48px;border-radius:12px;border:1px solid var(--line);color:var(--ink)}
 button{padding:0 18px;background:var(--card);cursor:pointer}
 select,input{padding:0 12px;background:var(--bg);width:100%}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-button.go{background:var(--run);border-color:var(--run);color:#fff;width:100%;font-size:18px}
-button.go.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-button.pri{background:var(--sky);border-color:var(--sky);color:#fff}
+.go{background:var(--run);border-color:var(--run);color:#fff;width:100%;font-size:19px;min-height:56px;margin-top:14px}
+.pri{background:var(--sky);border-color:var(--sky);color:#fff}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:end}
 .row>*{flex:1 1 120px}
 .row>.sw{flex:0 0 48px;padding:0}
 label{font-size:13px;color:var(--sub);display:block}
 .pick{background:var(--skybg);border-radius:12px;padding:12px 14px;margin-top:10px}
-.pick b{font:400 26px/1.2 "Black Han Sans",sans-serif;white-space:nowrap}
-.status{font-size:14px;color:var(--sub);margin:10px 0 0;min-height:1.4em}
+.pick b{font:400 24px/1.2 "Black Han Sans","Noto Sans JP",sans-serif;white-space:nowrap}
+.status{font-size:14px;color:var(--sub);margin:8px 0 0;min-height:1.4em}
 .status.err{color:var(--run)}
 .cards{display:grid;gap:10px}
-.c{border-radius:14px;padding:14px 16px;background:var(--card);border:1px solid var(--line)}
+.c{border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line)}
 .c.open{border-color:var(--sky)}
 .c h3{margin:0 0 4px;font-size:16px;display:flex;justify-content:space-between;gap:8px}
 .c h3 small{font-weight:400;color:var(--sub);white-space:nowrap}
@@ -733,75 +731,114 @@ label{font-size:13px;color:var(--sub);display:block}
 .note{font-size:13px;color:var(--sub)}
 .confirm{display:none;background:var(--card);border:1px solid var(--run);border-radius:12px;padding:12px;margin-top:10px}
 .confirm.show{display:block}
-.toast{position:sticky;bottom:12px;margin:0 auto;max-width:420px;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none;z-index:2000}
-.toast.show{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){.bar i,.toast{transition:none}}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.setbtn{min-height:44px;padding:0 14px;font-size:15px;flex:none}
+.settings{display:none;background:var(--card);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.settings.show{display:block}
+.langs{display:flex;gap:8px;margin-top:6px}
+.langs button{flex:1}
+.langbtn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;align-items:center}
+/* 달리기 화면 */
+#runView{display:none;position:fixed;inset:0;z-index:5000;background:#16191d;color:#fff;overflow-y:auto}
+#runView.show{display:block}
+.runin{max-width:560px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 20px 28px;min-height:100%;display:flex;flex-direction:column}
+.rl{font-size:14px;color:#a9b1ba}
+.rbig{font:400 clamp(76px,24vw,120px)/1 "Black Han Sans","Noto Sans JP",sans-serif;margin:4px 0 0}
+.rbig small{font-size:26px;margin-left:6px}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0 14px}
+.rgrid b{display:block;font:400 34px/1.1 "Black Han Sans","Noto Sans JP",sans-serif;white-space:nowrap}
+.rnote{color:#a9b1ba;font-size:15px;margin:0}
+.rstatus{color:#a9b1ba;font-size:14px;margin:8px 0 0;min-height:1.4em}
+.rstatus.err{color:#ff8a80}
+#meBtn{margin-top:18px;background:transparent;color:#fff;border-color:#5b6570;width:100%}
+#meMap{display:none;height:42vh;border-radius:14px;margin-top:10px;background:#2a3037}
+#meMap.show{display:block}
+.rbtns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;padding-top:20px}
+.rbtns button{min-height:60px;font-size:18px}
+#pauseBtn{background:transparent;color:#fff;border-color:#5b6570}
+#endBtn{background:var(--run);border-color:var(--run);color:#fff}
+.endc{display:none;margin-top:10px;background:#2a3037;border-radius:12px;padding:12px}
+.endc.show{display:block}
 </style>
 </head>
 <body>
-<main class="band">
-  <h1>가상 통일 마라톤</h1>
-  <p class="lede">출발 도시와 도착 도시를 고르면 실제 도로를 따라 길을 찾고, 그 거리를 마라톤 한 번 거리로 줄여 드려요.</p>
+<main class="band" id="courseView">
+  <div class="top"><h1 data-i="title">가상 통일 마라톤</h1><button class="setbtn" id="setBtn" data-i="settings">설정</button></div>
+  <div class="settings" id="settings"><label data-i="language">언어</label><div class="langs"><button class="langbtn" data-lang="ko">한국어</button><button class="langbtn" data-lang="ja">日本語</button></div></div>
+  <p class="lede" data-i="lede">어디서든 달리면, 달린 거리만큼 서울–평양 코스 위를 전진해요. 코스 전체는 마라톤 거리 42.195km로 줄여 놓았어요.</p>
 
-  <div class="grid">
-    <section>
-      <div class="mapwrap">
-        <div id="lmap" aria-label="한반도 지도와 선택한 마라톤 코스"></div>
-        <div class="mapctl"><button id="whole">전체</button><button id="follow">코스 따라가기</button><button id="locate">내 위치</button></div>
-        <div class="mapinfo" id="mapinfo">지도 불러오는 중</div>
-      </div>
-      <div class="stats">
-        <div class="stat"><span>내가 달린 거리</span><b id="sKm">0.00 km</b></div>
-        <div class="stat"><span>지도 위 거리</span><b id="sReal">0 km</b></div>
-        <div class="stat"><span id="sNextL">다음 도시</span><b id="sNext">-</b></div>
-      </div>
-      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
-    </section>
+  <div id="lmap" data-ia="mapAria" aria-label="마라톤 코스 지도"></div>
+  <p class="adv" id="adv" aria-live="polite"></p>
+  <div class="newcard" id="newcard"></div>
 
-    <section>
-      <div class="panel">
-        <h2>코스 고르기</h2>
-        <div class="row">
-          <div><label for="selA">출발</label><select id="selA"></select></div>
-          <button class="sw" id="swap" aria-label="출발과 도착 바꾸기">⇄</button>
-          <div><label for="selB">도착</label><select id="selB"></select></div>
-        </div>
-        <div class="pick" id="pick"></div>
-        <div class="row"><button class="pri" id="setRoute">이 코스로 마라톤 시작</button></div>
-        <div class="confirm" id="confirm2">
-          <p style="margin:0 0 8px">지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?</p>
-          <div class="row"><button id="yes2">바꾸기</button><button id="no2">취소</button></div>
-        </div>
-      </div>
+  <div class="stats">
+    <div class="stat"><span data-i="ran">달린 거리</span><b id="sKm">0.0 / 42.2 km</b></div>
+    <div class="stat"><span id="sNextL">다음 도시까지</span><b id="sNext">-</b></div>
+  </div>
+  <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+  <button class="go" id="startBtn" data-i="start">달리기 시작</button>
+  <p class="status" id="status" aria-live="polite"></p>
 
-      <div class="panel">
-        <h2>달리기</h2>
-        <button class="go" id="gps">GPS로 달리기 시작</button>
-        <p class="status" id="status" aria-live="polite">밖에서 화면을 켠 채로 달려 주세요.</p>
-        <div class="row">
-          <input id="manual" type="number" inputmode="decimal" min="0.1" max="42.195" step="0.1" placeholder="5.0" aria-label="직접 입력할 거리(km)">
-          <button id="add">거리 추가</button>
-        </div>
-        <div class="row">
-          <button id="demo">시연 모드</button>
-          <button id="reset">처음부터</button>
-        </div>
-        <div class="confirm" id="confirm">
-          <p style="margin:0 0 8px">이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?</p>
-          <div class="row"><button id="yes">지우기</button><button id="no">취소</button></div>
-        </div>
-      </div>
-    </section>
+  <div class="panel">
+    <h2 data-i="addRec">기록 더하기</h2>
+    <div class="row">
+      <input id="manual" type="number" inputmode="decimal" min="0.1" max="42.195" step="0.1" placeholder="5.0" data-ia="manualAria" aria-label="직접 입력할 거리(km)">
+      <button id="add" data-i="addKm">거리 추가</button>
+    </div>
+    <div class="row"><button id="demo" data-i="demo">시연 모드</button></div>
   </div>
 
-  <div class="grid" style="margin-top:4px">
-    <div class="panel"><h2>코스 위 도시 카드</h2><div class="cards" id="cards"></div></div>
-    <div class="panel"><h2>달린 기록</h2><ul class="log" id="log"></ul><p class="note" id="empty">아직 기록이 없어요. 첫 1km를 달려 보세요.</p></div>
+  <div class="panel">
+    <h2 data-i="pickCourse">코스 고르기</h2>
+    <div class="row">
+      <div><label for="selA" data-i="from">출발</label><select id="selA"></select></div>
+      <button class="sw" id="swap" data-ia="swapAria" aria-label="출발과 도착 바꾸기">⇄</button>
+      <div><label for="selB" data-i="to">도착</label><select id="selB"></select></div>
+    </div>
+    <div class="pick" id="pick"></div>
+    <div class="row"><button class="pri" id="setRoute">이 코스로 마라톤 시작</button></div>
+    <div class="confirm" id="confirm2">
+      <p style="margin:0 0 8px" data-i="confirmRoute">지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?</p>
+      <div class="row"><button id="yes2" data-i="change">바꾸기</button><button id="no2" data-i="cancel">취소</button></div>
+    </div>
   </div>
 
-  <p class="note">지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 길 찾기 서버에 연결되지 않으면 Natural Earth 주요 도로로 만든 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근 구간을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.</p>
-  <div class="toast" id="toast" role="status"></div>
+  <div class="panel"><h2 data-i="cardsTitle">코스 위 도시 카드</h2><div class="cards" id="cards"></div></div>
+
+  <div class="panel">
+    <details><summary data-i="logTitle">달린 기록</summary>
+      <ul class="log" id="log"></ul><p class="note" id="empty" data-i="empty">아직 기록이 없어요.</p>
+      <div class="row"><button id="reset" data-i="reset">처음부터 다시</button></div>
+      <div class="confirm" id="confirm">
+        <p style="margin:0 0 8px" data-i="confirmReset">이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?</p>
+        <div class="row"><button id="yes" data-i="erase">지우기</button><button id="no" data-i="cancel">취소</button></div>
+      </div>
+    </details>
+  </div>
+
+  <p class="note" data-i="note">지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 서버에 연결되지 않으면 Natural Earth 주요 도로 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.</p>
 </main>
+
+<section id="runView" data-ia="runAria" aria-label="달리기 화면">
+  <div class="runin">
+    <div class="rl" data-i="ran">달린 거리</div>
+    <div class="rbig" id="rKm">0.00<small>km</small></div>
+    <div class="rgrid">
+      <div><div class="rl" data-i="time">시간</div><b id="rTime">0:00</b></div>
+      <div><div class="rl" data-i="pace">페이스 (분/km)</div><b id="rPace">-'--"</b></div>
+    </div>
+    <p class="rnote" id="rNote"></p>
+    <p class="rstatus" id="rStatus" aria-live="polite">위치를 찾는 중이에요...</p>
+    <button id="meBtn" data-i="meOpen">내 위치 지도 보기</button>
+    <div id="meMap" data-ia="meAria" aria-label="내 위치와 뛴 길 지도"></div>
+    <div class="endc" id="endc">
+      <p style="margin:0 0 8px" data-i="confirmEnd">이번 달리기를 끝내고 기록을 저장할까요?</p>
+      <div class="rbtns" style="padding-top:0"><button id="endNo" data-i="keepRun" style="background:transparent;color:#fff;border-color:#5b6570">계속 달리기</button><button id="endYes" data-i="saveEnd" style="background:var(--run);border-color:var(--run);color:#fff">저장하고 끝내기</button></div>
+    </div>
+    <div class="rbtns"><button id="pauseBtn" data-i="pause">일시정지</button><button id="endBtn" data-i="end">끝내기</button></div>
+  </div>
+</section>
 
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -836,15 +873,103 @@ const hav=(a,b)=>{const r=x=>x*Math.PI/180,dl=r(b.lat-a.lat),dn=r(b.lon-a.lon);c
 const byN=n=>CITIES.find(c=>c.n===n);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const inRing=(p,r)=>{let o=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const [xi,yi]=r[i],[xj,yj]=r[j];if((yi>p.lat)!==(yj>p.lat)&&p.lon<(xj-xi)*(p.lat-yi)/(yj-yi)+xi)o=!o}return o};
-const sideOf=p=>OUT.N.some(r=>inRing(p,r))?'N':OUT.S.some(r=>inRing(p,r))?'S':null;
-/* 판문점 부근: 남쪽 끝(도라산), 북쪽 끝(개성 남쪽 판문점 북측) */
 const GATE_S={lat:37.9050,lon:126.6930},GATE_N={lat:37.9620,lon:126.6560};
+const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
 
-let st={a:'서울',b:'평양',km:0,log:[]};
-try{const s=JSON.parse(localStorage.getItem('utm-v3'));if(s&&byN(s.a)&&byN(s.b)&&typeof s.km==='number')st=s}catch(e){}
-const save=()=>{try{localStorage.setItem('utm-v3',JSON.stringify(st))}catch(e){}};
+let st={a:'서울',b:'평양',km:0,log:[],run:null};
+try{const s=JSON.parse(localStorage.getItem('utm-v4'));if(s&&byN(s.a)&&byN(s.b)&&typeof s.km==='number')st=Object.assign(st,s)}catch(e){}
+const save=()=>{try{localStorage.setItem('utm-v4',JSON.stringify(st))}catch(e){}};
 let selA=st.a,selB=st.b,tapStep=0;
+
+/* 언어 설정 */
+const I18N={
+ko:{
+ title:'가상 통일 마라톤',
+ lede:'어디서든 달리면, 달린 거리만큼 서울–평양 코스 위를 전진해요. 코스 전체는 마라톤 거리 42.195km로 줄여 놓았어요.',
+ mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',
+ addRec:'기록 더하기',manualAria:'직접 입력할 거리(km)',addKm:'거리 추가',demo:'시연 모드',
+ pickCourse:'코스 고르기',from:'출발',to:'도착',swapAria:'출발과 도착 바꾸기',
+ setRoute:'이 코스로 마라톤 시작',curRoute:'지금 달리는 코스예요',
+ confirmRoute:'지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?',change:'바꾸기',cancel:'취소',
+ cardsTitle:'코스 위 도시 카드',logTitle:'달린 기록',empty:'아직 기록이 없어요.',reset:'처음부터 다시',
+ confirmReset:'이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?',erase:'지우기',
+ note:'지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 서버에 연결되지 않으면 Natural Earth 주요 도로 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.',
+ runAria:'달리기 화면',time:'시간',pace:'페이스 (분/km)',locating:'위치를 찾는 중이에요...',
+ meOpen:'내 위치 지도 보기',meClose:'내 위치 지도 닫기',meAria:'내 위치와 뛴 길 지도',
+ confirmEnd:'이번 달리기를 끝내고 기록을 저장할까요?',keepRun:'계속 달리기',saveEnd:'저장하고 끝내기',
+ pause:'일시정지',resume:'다시 달리기',end:'끝내기',
+ settings:'설정',language:'언어',
+ S:'남',N:'북',Sfull:'남한',Nfull:'북한',
+ until:'{c}까지',finished:'완주',congrats:'축하해요!',
+ pickErr:'출발과 도착은 다른 도시여야 해요.',realDist:'실제 도로 거리',quickDist:'간이 도로 거리',
+ pickNote:'직선거리 {s}km · 1km를 달리면 지도에서 {k}km를 가요',dmzNote:' · 휴전선 구간은 점선',
+ tapFrom:'{c} 출발 · 도착 도시를 눌러 주세요',changed:'{a} → {b} 코스로 바꿨어요',
+ hStart:'출발',hEnd:'도착! 완주',hPass:'통과',opensAt:'{k}km에서 열려요',
+ cardBase:'{side} 도시 · 출발점에서 길을 따라 약 {r}km',src:'출처',
+ newCard:'새 도시 카드',arrived:'{c} 도착!',arrivedEnd:'{c} 도착! 완주했어요',city:'{side} 도시',
+ advance:'{a}km 달림 → 지도에서 {r}km 전진!',manualErr:'0.1에서 42.195 사이의 거리를 입력해 주세요.',
+ restart:'처음부터 다시 시작해요',tooShort:'달린 거리가 거의 없어서 저장하지 않았어요',
+ rNote:'지도에서는 {r}km 전진 중',rNext:' · {c}까지 {k}km',rDone:' · 완주 거리 도달!',
+ noGeo:'이 브라우저는 위치를 지원하지 않아요.',weak:'GPS 신호가 약해요 (오차 {m}m). 하늘이 트인 곳으로 가 주세요.',
+ gpsOk:'GPS 연결됨',resumed:'다시 달려요',paused:'일시정지 중',
+ errHttps:'이 화면에서는 위치를 쓸 수 없어요. 배포한 주소(HTTPS)에서 열어 주세요.',
+ errPerm:'위치 권한이 꺼져 있어요. 아이폰은 설정 > 개인정보 보호 및 보안 > 위치 서비스에서 지금 쓰는 브라우저(Safari 또는 Chrome)를 "앱을 사용하는 동안"으로 바꾸고, 정확한 위치를 켠 뒤 새로고침해 주세요.',
+ errLost:'GPS 신호를 잠깐 놓쳤어요. 계속 달리면 다시 잡혀요.',
+ m_manual:'직접 입력',m_gps:'GPS',m_demo:'시연 모드',m_recover:'GPS(저장 복구)',prevRun:'이전 달리기'
+},
+ja:{
+ title:'バーチャル統一マラソン',
+ lede:'どこで走っても、走った距離だけソウル–平壌のコースを進みます。コース全体はマラソンの距離42.195kmに縮めてあります。',
+ mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',
+ addRec:'記録を追加',manualAria:'入力する距離（km）',addKm:'距離を追加',demo:'デモモード',
+ pickCourse:'コースを選ぶ',from:'出発',to:'到着',swapAria:'出発と到着を入れ替える',
+ setRoute:'このコースでスタート',curRoute:'現在のコースです',
+ confirmRoute:'今のコースの進み具合がリセットされます。コースを変更しますか？',change:'変更する',cancel:'キャンセル',
+ cardsTitle:'コース上の都市カード',logTitle:'ランニング記録',empty:'まだ記録がありません。',reset:'最初からやり直す',
+ confirmReset:'このコースの記録と開いたカードが消えます。最初からやり直しますか？',erase:'消去する',
+ note:'地図：© OpenStreetMap 寄稿者。ルート検索：OSRM公開サーバー（OpenStreetMapの道路データ）。サーバーに接続できない場合は、Natural Earthの主要道路データで作ったグラフからダイクストラ法で求めた簡易ルートを使います。軍事境界線は実際には通れないため、南北をまたぐコースは南側と北側の道を別々に探し、板門店付近を点線でつなぎます。コースから10km以内にある都市は通過する都市として表示されます。',
+ runAria:'ランニング画面',time:'時間',pace:'ペース（分/km）',locating:'現在地を探しています...',
+ meOpen:'現在地の地図を見る',meClose:'現在地の地図を閉じる',meAria:'現在地と走った道の地図',
+ confirmEnd:'ランニングを終了して記録を保存しますか？',keepRun:'走り続ける',saveEnd:'保存して終了',
+ pause:'一時停止',resume:'再開',end:'終了',
+ settings:'設定',language:'言語',
+ S:'南',N:'北',Sfull:'韓国',Nfull:'北朝鮮',
+ until:'{c}まで',finished:'完走',congrats:'おめでとう！',
+ pickErr:'出発地と到着地は別の都市にしてください。',realDist:'実際の道路距離',quickDist:'簡易道路距離',
+ pickNote:'直線距離 {s}km · 1km走ると地図上で{k}km進みます',dmzNote:' · 軍事境界線の区間は点線',
+ tapFrom:'{c}から出発 · 到着する都市をタップしてください',changed:'{a} → {b} のコースに変更しました',
+ hStart:'出発',hEnd:'到着！完走',hPass:'通過',opensAt:'{k}kmで開きます',
+ cardBase:'{side}の都市 · 出発地から道沿いに約{r}km',src:'出典',
+ newCard:'新しい都市カード',arrived:'{c}に到着！',arrivedEnd:'{c}に到着！完走しました',city:'{side}の都市',
+ advance:'{a}km走って → 地図上で{r}km前進！',manualErr:'0.1〜42.195の間の距離を入力してください。',
+ restart:'最初からやり直します',tooShort:'走った距離がほとんどないため保存しませんでした',
+ rNote:'地図上では{r}km前進中',rNext:' · {c}まで{k}km',rDone:' · 完走距離に到達！',
+ noGeo:'このブラウザは位置情報に対応していません。',weak:'GPS信号が弱いです（誤差{m}m）。空が開けた場所へ移動してください。',
+ gpsOk:'GPS接続済み',resumed:'再開しました',paused:'一時停止中',
+ errHttps:'この画面では位置情報を使えません。公開したアドレス（HTTPS）で開いてください。',
+ errPerm:'位置情報の許可がオフになっています。iPhoneの場合は 設定 > プライバシーとセキュリティ > 位置情報サービス で、使っているブラウザ（SafariまたはChrome）を「このAppの使用中のみ許可」にし、「正確な位置情報」をオンにしてから再読み込みしてください。',
+ errLost:'GPS信号を一時的に見失いました。走り続ければ再び受信します。',
+ m_manual:'手入力',m_gps:'GPS',m_demo:'デモモード',m_recover:'GPS（保存の復元）',prevRun:'前回のランニング'
+}};
+const CITY_JA={'서울':'ソウル','인천':'仁川','수원':'水原','도라산역':'都羅山駅','춘천':'春川','속초':'束草','강릉':'江陵','청주':'清州','대전':'大田','전주':'全州','광주':'光州','목포':'木浦','대구':'大邱','포항':'浦項','울산':'蔚山','부산':'釜山','제주':'済州','개성':'開城','해주':'海州','사리원':'沙里院','남포':'南浦','평양':'平壌','원산':'元山','함흥':'咸興','신의주':'新義州','강계':'江界','혜산':'恵山','청진':'清津','나선':'羅先'};
+const FACTS_JA={
+ '서울':['ソウル駅の鉄道起点標識には、平壌まで260.7km、新義州まで496.0kmと書かれています。','ソウル市「내 손안에 서울」'],
+ '도라산역':['駅には「南の最後の駅ではなく、北へ向かう最初の駅」という標識があります。','Wikipedia, DMZ Train'],
+ '개성':['高麗の都だった都市です。平壌–開城高速道路の南端はこの近くです。','Wikipedia, 平壌–開城高速道路'],
+ '사리원':['平壌–開城高速道路（全長170km）が通る都市です。高速道路の標識にはソウルまでの距離が書かれていますが、境界を越えることはできません。','Wikipedia, 平壌–開城高速道路'],
+ '평양':['2025年4月6日、コロナで中断されてから6年ぶりに平壌国際マラソンが再開されました。','ソウル経済（서울경제）, 2025.4.8']
+};
+let lang='ko';try{const l=localStorage.getItem('utm-lang');if(l==='ja'||l==='ko')lang=l}catch(e){}
+const t=(k,v)=>{let s=(I18N[lang][k]??I18N.ko[k]??k);if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s};
+const cn=n=>lang==='ja'?(CITY_JA[n]||n):n;
+const fact=n=>{const f=FACTS[n];if(!f)return null;const j=lang==='ja'&&FACTS_JA[n];return j?[j[0],j[1],f[2]]:f};
+function applyStatic(){
+  document.documentElement.lang=lang;document.title=t('title');
+  document.querySelectorAll('[data-i]').forEach(el=>{el.textContent=t(el.dataset.i)});
+  document.querySelectorAll('[data-ia]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.ia))});
+  document.querySelectorAll('.langbtn').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+}
+
 
 /* 간이 도로 그래프 + 다익스트라 (오프라인 대비) */
 const NN=G.n.map(([lon,lat])=>({lon,lat})),ADJ=NN.map(()=>[]);
@@ -906,76 +1031,52 @@ function at(R,f){
 }
 
 /* 지도 */
-const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
-const map=L.map('lmap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH}).setView([38.2,127.3],6);
+
+
+/* 코스 지도 (하나뿐) */
+const map=L.map('lmap',{zoomControl:false,attributionControl:true,preferCanvas:true,dragging:!TOUCH,scrollWheelZoom:false,doubleClickZoom:false}).setView([38.2,127.3],6);
 map.attributionControl.setPrefix(false);
 map.createPane('base');map.getPane('base').style.zIndex=150;
 const ll=p=>[p.lat,p.lon];
 ['S','N'].forEach(k=>OUT[k].forEach(r=>L.polygon(r.map(([x,y])=>[y,x]),{pane:'base',color:'#ffffff',weight:1,fillColor:'#9fcaf0',fillOpacity:1}).addTo(map)));
-let tilesOK=false,tileErr=0;
-const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>'}).addTo(map);
-tiles.on('tileload',()=>{if(!tilesOK){tilesOK=true;info()}});
-tiles.on('tileerror',()=>{tileErr++;if(!tilesOK&&tileErr===3)info()});
+const tileUrl='https://tile.openstreetmap.org/{z}/{x}/{y}.png',tileAttr='<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>';
+L.tileLayer(tileUrl,{maxZoom:19,attribution:tileAttr}).addTo(map);
 const routeBase=L.polyline([],{color:'#14181d',weight:5,opacity:.85}).addTo(map);
 const routeGap=L.polyline([],{color:'#14181d',weight:4,dashArray:'6 8',opacity:.85}).addTo(map);
 const routeDone=L.polyline([],{color:'#e5483b',weight:6}).addTo(map);
 const runner=L.circleMarker([0,0],{radius:9,color:'#fff',weight:3,fillColor:'#e5483b',fillOpacity:1}).addTo(map);
 const cityLayer=L.layerGroup().addTo(map);
-let follow=false,meMode=false,mePos=null;
-const meTrack=L.polyline([],{color:'#2f7fe0',weight:5,opacity:.9}).addTo(map);
-const meAcc=L.circle([0,0],{radius:1,color:'#2f7fe0',weight:1,fillColor:'#2f7fe0',fillOpacity:.12,opacity:0});
-const meDot=L.circleMarker([0,0],{radius:8,color:'#fff',weight:3,fillColor:'#2f7fe0',fillOpacity:1});
-function showMe(lat,lon,acc){
-  mePos=[lat,lon];
-  if(!map.hasLayer(meDot)){meAcc.addTo(map);meDot.addTo(map);mePos&&info()}
-  meDot.setLatLng(mePos);meAcc.setLatLng(mePos).setRadius(acc||10);meAcc.setStyle({opacity:.5});
-  if(meMode)map.panTo(mePos,{animate:false});
-}
-function setMode(m){
-  follow=m==='follow';meMode=m==='me';
-  $('follow').classList.toggle('on',follow);$('locate').classList.toggle('on',meMode);
-}
 
-function info(){
-  const R=C;const parts=[];
-  if(tilesOK)parts.push('실제 지도');else if(tileErr>=3)parts.push('지도 그림을 못 불러왔어요 (배포한 주소에서 열어 주세요)');else parts.push('지도 불러오는 중');
-  parts.push(R.src==='osrm'?'경로: 실제 도로':'경로: 간이 도로망');if(mePos)parts.push('파란 점: 내 위치');
-  $('mapinfo').textContent=parts.join(' · ');
-}
-
-let C=quickCourse(st.a,st.b),P=C;
-const opts=CITIES.map(c=>`<option value="${esc(c.n)}">${esc(c.n)} (${c.side==='S'?'남':'북'})</option>`).join('');
-$('selA').innerHTML=opts;$('selB').innerHTML=opts;
+let C=quickCourse(st.a,st.b),P=C,shown=st.km;
+function fillOpts(){const opts=CITIES.map(c=>`<option value="${esc(c.n)}">${esc(cn(c.n))} (${t(c.side)})</option>`).join('');$('selA').innerHTML=opts;$('selB').innerHTML=opts}
+fillOpts();
 
 function drawCities(){
   cityLayer.clearLayers();
-  const R=P,on=new Set([selA,selB,...R.stops.map(s=>s.c.n)]);
+  const on=new Set([selA,selB,...P.stops.map(s=>s.c.n)]);
   CITIES.forEach(c=>{
     const isA=c.n===selA,isB=c.n===selB;
-    const m=L.circleMarker([c.lat,c.lon],{radius:isA||isB?8:5,color:'#14181d',weight:2,fillColor:isA?'#14181d':isB?'#e5483b':'#ffffff',fillOpacity:1});
-    m.bindTooltip(c.n,{permanent:on.has(c.n)||map.getZoom()>=9,direction:'right',offset:[8,0],className:'lab'});
+    const m=L.circleMarker([c.lat,c.lon],{radius:isA||isB?8:4,color:'#14181d',weight:2,fillColor:isA?'#14181d':isB?'#e5483b':'#ffffff',fillOpacity:1});
+    if(on.has(c.n))m.bindTooltip(cn(c.n),{permanent:true,direction:'right',offset:[8,0],className:'lab'});
     m.on('click',()=>pickCity(c.n));
     cityLayer.addLayer(m);
   });
 }
 function drawRoute(){
-  const R=P,preview=R!==C;
-  const gapAt=new Set(R.gap);
-  const segs=[[]],gaps=[];
-  R.geo.forEach((p,i)=>{segs[segs.length-1].push(ll(p));if(gapAt.has(i)){gaps.push([ll(p),ll(R.geo[i+1])]);segs.push([])}});
+  const preview=P!==C,gapAt=new Set(P.gap),segs=[[]],gaps=[];
+  P.geo.forEach((p,i)=>{segs[segs.length-1].push(ll(p));if(gapAt.has(i)){gaps.push([ll(p),ll(P.geo[i+1])]);segs.push([])}});
   routeBase.setLatLngs(segs);routeBase.setStyle({dashArray:preview?'8 8':null});
   routeGap.setLatLngs(gaps);
   routeDone.setStyle({opacity:preview?0:1});runner.setStyle({opacity:preview?0:1,fillOpacity:preview?0:1});
 }
-function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{padding:[30,30]})}
-map.on('zoomend',drawCities);
+function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{padding:[28,28]})}
+window.addEventListener('resize',()=>{clearTimeout(fitRoute.t);fitRoute.t=setTimeout(fitRoute,200)});
 
 function updatePick(){
   $('selA').value=selA;$('selB').value=selB;
-  if(selA===selB){$('pick').innerHTML='<span class="status err">출발과 도착은 다른 도시여야 해요.</span>';return}
-  const R=P;
-  $('pick').innerHTML=`<label>${esc(selA)} → ${esc(selB)} ${R.src==='osrm'?'실제 도로 거리':'간이 도로 거리'}</label><b>${R.D.toFixed(1)} km</b><div class="note">직선거리 ${R.straight.toFixed(1)}km · 1km를 달리면 지도에서 ${R.scale.toFixed(1)}km를 가요${R.cross!==null?' · 휴전선 구간은 점선':''}</div>`;
-  $('setRoute').textContent=(selA===st.a&&selB===st.b)?'지금 달리는 코스예요':'이 코스로 마라톤 시작';
+  if(selA===selB){$('pick').innerHTML=`<span class="status err">${esc(t('pickErr'))}</span>`;return}
+  $('pick').innerHTML=`<label>${esc(cn(selA))} → ${esc(cn(selB))} ${t(P.src==='osrm'?'realDist':'quickDist')}</label><b>${P.D.toFixed(1)} km</b><div class="note">${esc(t('pickNote',{s:P.straight.toFixed(1),k:P.scale.toFixed(1)}))}${P.cross!==null?esc(t('dmzNote')):''}</div>`;
+  $('setRoute').textContent=t((selA===st.a&&selB===st.b)?'curRoute':'setRoute');
 }
 let reqId=0;
 async function preview(){
@@ -986,18 +1087,20 @@ async function preview(){
   const R=await realCourse(selA,selB);
   if(id!==reqId||!R)return;
   if(selA===st.a&&selB===st.b){C=R;P=C}else P=R;
-  drawRoute();drawCities();updatePick();render(false);info();
+  drawRoute();drawCities();updatePick();paint(shown);fitRoute();
 }
 function pickCity(n){
-  if(tapStep===0){selA=n;tapStep=1;toast(n+' 출발! 이제 도착 도시를 눌러요');updatePick();drawCities()}
-  else{if(n===selA){toast('다른 도시를 골라 주세요');return}selB=n;tapStep=0;preview()}
+  if(tapStep===0){selA=n;tapStep=1;$('adv').textContent=t('tapFrom',{c:cn(n)});updatePick();drawCities()}
+  else{if(n===selA)return;selB=n;tapStep=0;$('adv').textContent='';preview()}
 }
 $('selA').addEventListener('change',e=>{selA=e.target.value;tapStep=0;preview()});
 $('selB').addEventListener('change',e=>{selB=e.target.value;tapStep=0;preview()});
 $('swap').addEventListener('click',()=>{[selA,selB]=[selB,selA];preview()});
 function applyRoute(){
-  st={a:selA,b:selB,km:0,log:[]};C=P;opened=new Set([selA]);crossed=false;save();
-  drawRoute();render();toast(`${selA} → ${selB} 코스로 바꿨어요`);
+  st={a:selA,b:selB,km:0,log:[],run:null};C=P;shown=0;save();
+  drawRoute();drawCities();updatePick();paint(0);renderLists();fitRoute();
+  $('newcard').classList.remove('show');$('adv').textContent=t('changed',{a:cn(selA),b:cn(selB)});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 $('setRoute').addEventListener('click',()=>{
   if(selA===selB||(selA===st.a&&selB===st.b))return;
@@ -1005,118 +1108,164 @@ $('setRoute').addEventListener('click',()=>{
 });
 $('yes2').addEventListener('click',()=>{$('confirm2').classList.remove('show');applyRoute()});
 $('no2').addEventListener('click',()=>$('confirm2').classList.remove('show'));
-$('whole').addEventListener('click',()=>{setMode('none');fitRoute()});
-$('follow').addEventListener('click',()=>{setMode(follow?'none':'follow');if(follow){map.setView(ll(at(C,Math.min(st.km,TOTAL)/TOTAL)),Math.max(map.getZoom(),14))}});
-const locErr=err=>err.code===1?(location.protocol!=='https:'||window.self!==window.top?'이 화면에서는 위치를 쓸 수 없어요. 배포한 주소(HTTPS)에서 열어 주세요.':'위치 권한이 꺼져 있어요. 아이폰은 설정 > 개인정보 보호 및 보안 > 위치 서비스에서 지금 쓰는 브라우저(Safari 또는 Chrome)를 "앱을 사용하는 동안"으로 바꾸고, 정확한 위치를 켠 뒤 페이지를 새로고침해 주세요.'):'위치를 가져오지 못했어요. 하늘이 트인 곳에서 다시 시도해 주세요.';
-$('locate').addEventListener('click',()=>{
-  if(meMode){setMode('none');return}
-  setMode('me');
-  if(mePos){map.setView(mePos,Math.max(map.getZoom(),16));return}
-  if(!('geolocation'in navigator)){setMode('none');toast('이 브라우저는 위치를 지원하지 않아요');return}
-  toast('내 위치를 찾는 중이에요');
-  navigator.geolocation.getCurrentPosition(pos=>{const c=pos.coords;showMe(c.latitude,c.longitude,c.accuracy);map.setView(mePos,16)},
-    err=>{setMode('none');$('status').textContent=locErr(err);$('status').className='status err';toast('위치를 가져오지 못했어요')},
-    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
-});
 
-let opened=new Set(C.stops.filter(s=>s.km<=st.km+1e-9).map(s=>s.c.n));
-let crossed=C.cross!==null&&st.km/TOTAL>=C.cross;
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600)}
-
-function render(notify=true){
-  const km=Math.min(st.km,TOTAL),f=km/TOTAL,p=at(C,f);
+/* 화면 그리기 */
+function paint(km){
+  km=Math.min(km,TOTAL);const f=km/TOTAL,p=at(C,f);
   runner.setLatLng(ll(p));
   const done=C.geo.slice(0,p.i).map(ll);done.push(ll(p));routeDone.setLatLngs(done);
-  if(follow)map.panTo(ll(p),{animate:false});
   $('bar').style.width=(f*100).toFixed(1)+'%';
-  $('sKm').textContent=km.toFixed(2)+' km';
-  $('sReal').textContent=Math.round(km*C.scale)+' km';
+  $('sKm').textContent=km.toFixed(1)+' / 42.2 km';
   const nx=C.stops.find(s=>s.km>km+1e-9);
-  $('sNextL').textContent=nx?nx.c.n+'까지':'완주';
-  $('sNext').textContent=nx?(nx.km-km).toFixed(1)+' km':'42.195';
-  $('cards').innerHTML=C.stops.map((s,i)=>{
-    const o=s.km<=km+1e-9,fct=FACTS[s.c.n];
-    const head=i===0?'출발':i===C.stops.length-1?'도착! 완주':'통과';
-    const base=`${s.c.side==='S'?'남한':'북한'} 도시 · 출발점에서 길을 따라 약 ${Math.round(s.real)}km`;
-    return `<article class="c ${o?'open':'lock'}"><h3>${esc(s.c.n)}<small>${o?head:s.km.toFixed(1)+'km에서 열려요'}</small></h3><p>${esc(base)}${fct?'<br>'+esc(fct[0]):''}</p>${fct?`<a href="${esc(fct[2])}" target="_blank" rel="noopener">출처: ${esc(fct[1])}</a>`:''}</article>`;
-  }).join('');
-  $('log').innerHTML=st.log.slice().reverse().map(r=>`<li><span>${esc(r.d)} · ${esc(r.m)}</span><span>${Number(r.km).toFixed(2)} km</span></li>`).join('');
+  $('sNextL').textContent=nx?t('until',{c:cn(nx.c.n)}):t('finished');
+  $('sNext').textContent=nx?(nx.km-km).toFixed(1)+' km':t('congrats');
+}
+function cardHTML(s,i){
+  const o=s.km<=st.km+1e-9,fct=fact(s.c.n);
+  const head=t(i===0?'hStart':i===C.stops.length-1?'hEnd':'hPass');
+  const base=t('cardBase',{side:t(s.c.side+'full'),r:Math.round(s.real)});
+  return `<article class="c ${o?'open':'lock'}"><h3>${esc(cn(s.c.n))}<small>${esc(o?head:t('opensAt',{k:s.km.toFixed(1)}))}</small></h3><p>${esc(base)}${fct?'<br>'+esc(fct[0]):''}</p>${fct?`<a href="${esc(fct[2])}" target="_blank" rel="noopener">${esc(t('src'))}: ${esc(fct[1])}</a>`:''}</article>`;
+}
+function renderLists(){
+  $('cards').innerHTML=C.stops.map(cardHTML).join('');
+  const LEG={'직접 입력':'manual','시연 모드':'demo','GPS':'gps','GPS(저장 복구)':'recover'};
+  const fd=r=>r.ts?new Date(r.ts).toLocaleString(lang==='ja'?'ja-JP':'ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):(r.d==='이전 달리기'?t('prevRun'):r.d==='시연'?t('m_demo'):r.d);
+  const fm=r=>{const k=LEG[r.m]||r.m;return I18N.ko['m_'+k]?t('m_'+k):r.m};
+  $('log').innerHTML=st.log.slice().reverse().map(r=>`<li><span>${esc(fd(r))} · ${esc(fm(r))}</span><span>${Number(r.km).toFixed(2)} km</span></li>`).join('');
   $('empty').style.display=st.log.length?'none':'block';
-  if(notify){
-    C.stops.forEach(s=>{if(s.km<=km+1e-9&&!opened.has(s.c.n)){opened.add(s.c.n);toast(s.c.n+' 도착! 도시 카드가 열렸어요')}});
-    if(C.cross!==null&&!crossed&&f>=C.cross){crossed=true;toast('휴전선에 닿았어요. 실제로는 지나갈 수 없는 길이에요')}
-  }
+}
+function showNewCard(s){
+  const fct=fact(s.c.n),last=s===C.stops[C.stops.length-1];
+  $('newcard').innerHTML=`<small>${esc(t('newCard'))}</small><b>${esc(t(last?'arrivedEnd':'arrived',{c:cn(s.c.n)}))}</b><p>${esc(t('city',{side:t(s.c.side+'full')}))}${fct?' · '+esc(fct[0]):''}</p>${fct?`<a href="${esc(fct[2])}" target="_blank" rel="noopener">${esc(t('src'))}: ${esc(fct[1])}</a>`:''}`;
+  $('newcard').classList.add('show');
 }
 
-function addKm(k,method){
-  if(!(k>0))return;
-  st.km=Math.min(TOTAL,st.km+k);
-  const d=new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  st.log.push({d,m:method,km:k});save();render();
+/* 전진 애니메이션 */
+let anim=null;
+function advance(addKm,method,dur){
+  if(!(addKm>0))return;
+  const from=st.km,to=Math.min(TOTAL,from+addKm),real=(to-from)*C.scale;
+  st.km=to;
+  st.log.push({ts:Date.now(),m:method,km:addKm});save();
+  const passed=C.stops.filter(s=>s.km>from+1e-9&&s.km<=to+1e-9);
+  $('newcard').classList.remove('show');
+  $('adv').textContent=t('advance',{a:addKm.toFixed(2),r:real<10?real.toFixed(1):Math.round(real)});
+  fitRoute();
+  if(anim)cancelAnimationFrame(anim);
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const T0=performance.now(),D=reduce?1:(dur||2200);
+  const step=t=>{
+    const u=Math.min(1,(t-T0)/D),e=1-Math.pow(1-u,3);
+    shown=from+(to-from)*e;paint(shown);
+    const hit=passed.filter(s=>s.km<=shown+1e-9).pop();if(hit)showNewCard(hit);
+    if(u<1)anim=requestAnimationFrame(step);else{anim=null;shown=to;paint(to);renderLists()}
+  };
+  anim=requestAnimationFrame(step);
 }
 $('add').addEventListener('click',()=>{
   const v=parseFloat($('manual').value);
-  if(!(v>0&&v<=42.195)){$('status').textContent='0.1에서 42.195 사이의 거리를 입력해 주세요.';$('status').className='status err';return}
-  addKm(v,'직접 입력');$('manual').value='';$('status').textContent='추가했어요.';$('status').className='status';
+  if(!(v>0&&v<=42.195)){$('status').textContent=t('manualErr');$('status').className='status err';return}
+  $('manual').value='';$('status').textContent='';$('status').className='status';
+  window.scrollTo({top:0,behavior:'smooth'});advance(v,'manual');
 });
 $('manual').addEventListener('input',()=>{$('status').className='status'});
+$('demo').addEventListener('click',()=>{
+  if(st.km>=TOTAL){st.km=0;shown=0;paint(0)}
+  window.scrollTo({top:0,behavior:'smooth'});
+  advance(TOTAL-st.km,'demo',9000);
+});
+$('reset').addEventListener('click',()=>$('confirm').classList.add('show'));
+$('no').addEventListener('click',()=>$('confirm').classList.remove('show'));
+$('yes').addEventListener('click',()=>{st.km=0;st.log=[];shown=0;save();$('confirm').classList.remove('show');$('newcard').classList.remove('show');$('adv').textContent=t('restart');paint(0);renderLists()});
 
+/* 달리기 화면 */
 const hm=(a,b)=>hav(a,b)*1000;
-let watch=null,last=null,runM=0,lock=null;
+let watch=null,last=null,lock=null,run=null,tick=null,meMap=null,meDot=null,meAcc=null,meTrack=null,mePos=null;
 async function wake(){try{if('wakeLock'in navigator)lock=await navigator.wakeLock.request('screen')}catch(e){}}
-function stopGps(){
-  if(watch!==null)navigator.geolocation.clearWatch(watch);
-  watch=null;last=null;try{lock&&lock.release()}catch(e){}lock=null;
-  $('gps').textContent='GPS로 달리기 시작';$('gps').classList.remove('on');
-  if(runM>=10){const k=runM/1000;st.km=Math.max(0,st.km-k);addKm(k,'GPS')}
-  runM=0;
+const locErr=err=>err.code===1?t(location.protocol!=='https:'||window.self!==window.top?'errHttps':'errPerm'):t('errLost');
+const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
+function elapsed(){return run?run.acc+(run.paused?0:(Date.now()-run.t0)/1000):0}
+function paintRun(){
+  const km=run.m/1000,sec=elapsed();
+  $('rKm').innerHTML=km.toFixed(2)+'<small>km</small>';
+  $('rTime').textContent=fmtT(sec);
+  if(km>=0.05){const pace=sec/km;$('rPace').textContent=`${Math.floor(pace/60)}'${String(Math.round(pace%60)).padStart(2,'0')}"`}else $('rPace').textContent=`-'--"`;
+  const now=Math.min(TOTAL,st.km+km),nx=C.stops.find(s=>s.km>now+1e-9);
+  $('rNote').textContent=t('rNote',{r:(km*C.scale).toFixed(1)})+(nx?t('rNext',{c:cn(nx.c.n),k:(nx.km-now).toFixed(1)}):t('rDone'));
+  st.run={m:run.m};save();
 }
-$('gps').addEventListener('click',()=>{
-  if(watch!==null){stopGps();$('status').textContent='달리기를 마쳤어요. 기록을 저장했어요.';$('status').className='status';return}
-  if(!('geolocation'in navigator)){$('status').textContent='이 브라우저는 위치를 지원하지 않아요. 거리 직접 입력을 써 주세요.';$('status').className='status err';return}
-  runM=0;last=null;wake();setMode('me');if(mePos)map.setView(mePos,Math.max(map.getZoom(),16));
-  $('gps').textContent='달리기 끝내기';$('gps').classList.add('on');
-  $('status').textContent='위치를 찾는 중이에요...';$('status').className='status';
+function startWatch(){
+  if(!('geolocation'in navigator)){$('rStatus').textContent=t('noGeo');$('rStatus').className='rstatus err';return}
   watch=navigator.geolocation.watchPosition(pos=>{
     const c=pos.coords,now={lat:c.latitude,lon:c.longitude,t:pos.timestamp};
-    showMe(c.latitude,c.longitude,c.accuracy);
-    if(c.accuracy>30){$('status').textContent=`GPS 신호가 약해요 (오차 ${Math.round(c.accuracy)}m). 하늘이 트인 곳으로 가 주세요.`;return}
+    mePos=[now.lat,now.lon];
+    if(meMap){meDot.setLatLng(mePos);meAcc.setLatLng(mePos).setRadius(c.accuracy||10);meMap.panTo(mePos,{animate:false})}
+    if(run.paused){last=null;return}
+    if(c.accuracy>30){$('rStatus').textContent=t('weak',{m:Math.round(c.accuracy)});$('rStatus').className='rstatus';return}
+    $('rStatus').textContent=t('gpsOk');$('rStatus').className='rstatus';
     if(last){
       const d=hm(last,now),dt=(now.t-last.t)/1000;
       if(d<3)return;
       if(dt>0&&d/dt>7){last=now;return}
-      runM+=d;meTrack.addLatLng([now.lat,now.lon]);st.km=Math.min(TOTAL,st.km+d/1000);render();
-    }
-    if(!last)meTrack.setLatLngs([[now.lat,now.lon]]);
+      run.m+=d;run.track.push(mePos);if(meTrack)meTrack.addLatLng(mePos);paintRun();
+    }else{run.track.push(mePos);if(meTrack)meTrack.addLatLng(mePos)}
     last=now;
-    $('status').textContent=`달리는 중: 이번에 ${(runM/1000).toFixed(2)}km`;
   },err=>{
-    if(err.code!==1){$('status').textContent='GPS 신호를 잠깐 놓쳤어요. 계속 달리면 다시 잡혀요.';return}
-    stopGps();$('status').textContent=locErr(err);$('status').className='status err';
+    $('rStatus').textContent=locErr(err);$('rStatus').className='rstatus'+(err.code===1?' err':'');
   },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
+}
+$('startBtn').addEventListener('click',()=>{
+  run={m:0,acc:0,t0:Date.now(),paused:false,track:[]};last=null;
+  $('runView').classList.add('show');document.body.style.overflow='hidden';
+  setI('pauseBtn','pause');$('endc').classList.remove('show');
+  $('rStatus').textContent=t('locating');$('rStatus').className='rstatus';
+  if(meTrack)meTrack.setLatLngs([]);
+  paintRun();wake();startWatch();
+  tick=setInterval(()=>{if(run&&!run.paused)paintRun()},1000);
 });
-document.addEventListener('visibilitychange',()=>{if(watch!==null&&document.visibilityState==='visible')wake()});
-
-let demoT=null;
-$('demo').addEventListener('click',()=>{
-  if(demoT){clearInterval(demoT);demoT=null;$('demo').textContent='시연 모드';return}
-  if(st.km>=TOTAL){st.km=0;opened=new Set([st.a]);crossed=false}
-  const start=st.km;$('demo').textContent='시연 멈추기';
-  setMode('follow');
-  map.setView(ll(at(C,st.km/TOTAL)),Math.max(map.getZoom(),13),{animate:false});
-  document.querySelector('.mapwrap').scrollIntoView({behavior:'smooth',block:'start'});
-  demoT=setInterval(()=>{
-    st.km=Math.min(TOTAL,st.km+0.12);render();
-    if(st.km>=TOTAL){clearInterval(demoT);demoT=null;$('demo').textContent='시연 모드';st.log.push({d:'시연',m:'시연 모드',km:TOTAL-start});save();render()}
-  },100);
+$('pauseBtn').addEventListener('click',()=>{
+  if(!run)return;
+  if(run.paused){run.paused=false;run.t0=Date.now();setI('pauseBtn','pause');$('rStatus').textContent=t('resumed')}
+  else{run.acc=elapsed();run.paused=true;last=null;setI('pauseBtn','resume');$('rStatus').textContent=t('paused')}
 });
+$('endBtn').addEventListener('click',()=>$('endc').classList.add('show'));
+$('endNo').addEventListener('click',()=>$('endc').classList.remove('show'));
+$('endYes').addEventListener('click',()=>{
+  if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(tick);
+  try{lock&&lock.release()}catch(e){}lock=null;
+  const km=run.m/1000;run=null;st.run=null;save();
+  $('runView').classList.remove('show');document.body.style.overflow='';
+  window.scrollTo({top:0});
+  setTimeout(()=>{map.invalidateSize();if(km>=0.01)advance(km,'gps');else{$('adv').textContent=t('tooShort');fitRoute()}},250);
+});
+$('meBtn').addEventListener('click',()=>{
+  const box=$('meMap'),open=!box.classList.contains('show');
+  box.classList.toggle('show',open);setI('meBtn',open?'meClose':'meOpen');
+  if(!open)return;
+  if(!meMap){
+    meMap=L.map('meMap',{zoomControl:false,attributionControl:true}).setView(mePos||[37.5665,126.978],16);
+    meMap.attributionControl.setPrefix(false);
+    L.tileLayer(tileUrl,{maxZoom:19,attribution:tileAttr}).addTo(meMap);
+    meTrack=L.polyline(run?run.track:[],{color:'#4f9be0',weight:5}).addTo(meMap);
+    meAcc=L.circle(mePos||[0,0],{radius:10,color:'#4f9be0',weight:1,fillOpacity:.15}).addTo(meMap);
+    meDot=L.circleMarker(mePos||[0,0],{radius:8,color:'#fff',weight:3,fillColor:'#4f9be0',fillOpacity:1}).addTo(meMap);
+  }
+  setTimeout(()=>{meMap.invalidateSize();if(mePos)meMap.setView(mePos,16)},60);
+});
+document.addEventListener('visibilitychange',()=>{if(run&&document.visibilityState==='visible')wake()});
 
-$('reset').addEventListener('click',()=>$('confirm').classList.add('show'));
-$('no').addEventListener('click',()=>$('confirm').classList.remove('show'));
-$('yes').addEventListener('click',()=>{st.km=0;st.log=[];opened=new Set([st.a]);crossed=false;save();$('confirm').classList.remove('show');render();toast('처음부터 다시 시작해요')});
-
-drawRoute();drawCities();updatePick();render(false);info();fitRoute();
-realCourse(st.a,st.b).then(R=>{if(R&&selA===st.a&&selB===st.b){C=R;P=C;drawRoute();drawCities();updatePick();render(false)}info()});
+function setI(id,k){const el=$(id);el.dataset.i=k;el.textContent=t(k)}
+$('setBtn').addEventListener('click',()=>$('settings').classList.toggle('show'));
+document.querySelectorAll('.langbtn').forEach(b=>b.addEventListener('click',()=>{
+  lang=b.dataset.lang;try{localStorage.setItem('utm-lang',lang)}catch(e){}
+  applyStatic();fillOpts();drawCities();updatePick();paint(shown);renderLists();
+  $('newcard').classList.remove('show');$('adv').textContent='';$('settings').classList.remove('show');
+}));
+/* 시작 */
+applyStatic();
+if(st.run&&st.run.m>=10){const k=st.run.m/1000;st.run=null;st.km=Math.min(TOTAL,st.km+k);st.log.push({ts:Date.now(),m:'recover',km:k});save();shown=st.km}
+drawRoute();drawCities();updatePick();paint(shown);renderLists();fitRoute();
+realCourse(st.a,st.b).then(R=>{if(R&&selA===st.a&&selB===st.b){C=R;P=C;drawRoute();drawCities();updatePick();paint(shown);renderLists();fitRoute()}});
 }
 </script>
 </body>
