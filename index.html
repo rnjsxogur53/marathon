@@ -711,6 +711,7 @@ select,input{padding:0 12px;background:var(--bg);width:100%}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .go{background:var(--run);border-color:var(--run);color:#fff;width:100%;font-size:19px;min-height:56px;margin-top:14px}
 .go2{background:transparent;border:1.5px solid var(--run);color:var(--run);width:100%;font-size:17px;min-height:52px;margin-top:10px}
+.resetbtn{border-color:var(--run);color:var(--run);background:transparent}
 .pri{background:var(--sky);border-color:var(--sky);color:#fff}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:end}
 .row>*{flex:1 1 120px}
@@ -816,12 +817,12 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
   <div class="panel">
     <details><summary data-i="logTitle">달린 기록</summary>
       <ul class="log" id="log"></ul><p class="note" id="empty" data-i="empty">아직 기록이 없어요.</p>
-      <div class="row"><button id="reset" data-i="reset">처음부터 다시</button></div>
-      <div class="confirm" id="confirm">
-        <p style="margin:0 0 8px" data-i="confirmReset">이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?</p>
-        <div class="row"><button id="yes" data-i="erase">지우기</button><button id="no" data-i="cancel">취소</button></div>
-      </div>
     </details>
+    <div class="row"><button id="reset" class="resetbtn" data-i="reset">달린 기록 초기화</button></div>
+    <div class="confirm" id="confirm">
+      <p style="margin:0 0 8px" data-i="confirmReset">이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?</p>
+      <div class="row"><button id="yes" data-i="erase">지우기</button><button id="no" data-i="cancel">취소</button></div>
+    </div>
   </div>
 
   <p class="note" data-i="note">지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 서버에 연결되지 않으면 Natural Earth 주요 도로 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.</p>
@@ -899,8 +900,8 @@ ko:{
  pickCourse:'코스 고르기',from:'출발',to:'도착',swapAria:'출발과 도착 바꾸기',
  setRoute:'이 코스로 마라톤 시작',curRoute:'지금 달리는 코스예요',
  confirmRoute:'지금 코스의 진행 기록이 처음으로 돌아가요. 코스를 바꿀까요?',change:'바꾸기',cancel:'취소',
- cardsTitle:'코스 위 도시 카드',logTitle:'달린 기록',empty:'아직 기록이 없어요.',reset:'처음부터 다시',
- confirmReset:'이 코스의 기록과 열린 카드가 지워져요. 처음부터 다시 할까요?',erase:'지우기',
+ cardsTitle:'코스 위 도시 카드',logTitle:'달린 기록',empty:'아직 기록이 없어요.',reset:'달린 기록 초기화',
+ confirmReset:'달린 기록과 열린 도시 카드가 모두 지워지고, 러너가 출발점으로 돌아가요. 초기화할까요?',erase:'초기화',
  note:'지도: © OpenStreetMap 기여자. 길 찾기: OSRM 공개 서버(OpenStreetMap 도로 기준). 서버에 연결되지 않으면 Natural Earth 주요 도로 그래프에서 다익스트라 알고리즘으로 찾은 간이 경로를 써요. 휴전선은 실제로 지나갈 수 없어서, 남북을 잇는 코스는 남쪽과 북쪽 길을 따로 찾은 뒤 판문점 부근을 점선으로 이어요. 코스에서 10km 안쪽에 있는 도시는 지나가는 도시로 표시돼요.',
  runAria:'달리기 화면',time:'시간',pace:'페이스 (분/km)',locating:'위치를 찾는 중이에요...',
  meOpen:'내 위치 지도 보기',meClose:'내 위치 지도 닫기',meAria:'내 위치와 뛴 길 지도',
@@ -916,7 +917,7 @@ ko:{
  cardBase:'{side} 도시 · 출발점에서 길을 따라 약 {r}km',src:'출처',
  newCard:'새 도시 카드',arrived:'{c} 도착!',arrivedEnd:'{c} 도착! 완주했어요',city:'{side} 도시',
  advance:'{a}km 달림 → 지도에서 {r}km 전진!',manualErr:'0.1에서 42.195 사이의 거리를 입력해 주세요.',
- restart:'처음부터 다시 시작해요',tooShort:'달린 거리가 거의 없어서 저장하지 않았어요',
+ restart:'달린 기록을 초기화했어요',tooShort:'달린 거리가 거의 없어서 저장하지 않았어요',
  rNote:'지도에서는 {r}km 전진 중',rNext:' · {c}까지 {k}km',rDone:' · 완주 거리 도달!',
  noGeo:'이 브라우저는 위치를 지원하지 않아요.',weak:'GPS 신호가 약해요 (오차 {m}m). 하늘이 트인 곳으로 가 주세요.',
  gpsOk:'GPS 연결됨',resumed:'다시 달려요',paused:'일시정지 중',
@@ -933,8 +934,8 @@ ja:{
  pickCourse:'コースを選ぶ',from:'出発',to:'到着',swapAria:'出発と到着を入れ替える',
  setRoute:'このコースでスタート',curRoute:'現在のコースです',
  confirmRoute:'今のコースの進み具合がリセットされます。コースを変更しますか？',change:'変更する',cancel:'キャンセル',
- cardsTitle:'コース上の都市カード',logTitle:'ランニング記録',empty:'まだ記録がありません。',reset:'最初からやり直す',
- confirmReset:'このコースの記録と開いたカードが消えます。最初からやり直しますか？',erase:'消去する',
+ cardsTitle:'コース上の都市カード',logTitle:'ランニング記録',empty:'まだ記録がありません。',reset:'記録をリセット',
+ confirmReset:'ランニング記録と開いた都市カードがすべて消え、ランナーはスタート地点に戻ります。リセットしますか？',erase:'リセットする',
  note:'地図：© OpenStreetMap 寄稿者。ルート検索：OSRM公開サーバー（OpenStreetMapの道路データ）。サーバーに接続できない場合は、Natural Earthの主要道路データで作ったグラフからダイクストラ法で求めた簡易ルートを使います。軍事境界線は実際には通れないため、南北をまたぐコースは南側と北側の道を別々に探し、板門店付近を点線でつなぎます。コースから10km以内にある都市は通過する都市として表示されます。',
  runAria:'ランニング画面',time:'時間',pace:'ペース（分/km）',locating:'現在地を探しています...',
  meOpen:'現在地の地図を見る',meClose:'現在地の地図を閉じる',meAria:'現在地と走った道の地図',
@@ -950,7 +951,7 @@ ja:{
  cardBase:'{side}の都市 · 出発地から道沿いに約{r}km',src:'出典',
  newCard:'新しい都市カード',arrived:'{c}に到着！',arrivedEnd:'{c}に到着！完走しました',city:'{side}の都市',
  advance:'{a}km走って → 地図上で{r}km前進！',manualErr:'0.1〜42.195の間の距離を入力してください。',
- restart:'最初からやり直します',tooShort:'走った距離がほとんどないため保存しませんでした',
+ restart:'記録をリセットしました',tooShort:'走った距離がほとんどないため保存しませんでした',
  rNote:'地図上では{r}km前進中',rNext:' · {c}まで{k}km',rDone:' · 完走距離に到達！',
  noGeo:'このブラウザは位置情報に対応していません。',weak:'GPS信号が弱いです（誤差{m}m）。空が開けた場所へ移動してください。',
  gpsOk:'GPS接続済み',resumed:'再開しました',paused:'一時停止中',
