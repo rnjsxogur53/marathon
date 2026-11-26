@@ -756,6 +756,8 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
 .rstatus{color:#a9b1ba;font-size:14px;margin:8px 0 0;min-height:1.4em}
 .rstatus.err{color:#ff8a80}
 #meBtn{margin-top:18px;background:transparent;color:#fff;border-color:#5b6570;width:100%}
+#vMap{display:none;height:40vh;min-height:240px;border-radius:14px;margin-top:16px;background:#cfe5f7}
+#vMap.show{display:block}
 #meMap{display:none;height:42vh;border-radius:14px;margin-top:10px;background:#2a3037}
 #meMap.show{display:block}
 .rbtns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;padding-top:20px}
@@ -836,6 +838,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
     <p class="rnote" id="rNote"></p>
     <p class="rstatus" id="rStatus" aria-live="polite">위치를 찾는 중이에요...</p>
     <button id="meBtn" data-i="meOpen">내 위치 지도 보기</button>
+    <div id="vMap" data-ia="mapAria" aria-label="마라톤 코스 지도"></div>
     <div id="meMap" data-ia="meAria" aria-label="내 위치와 뛴 길 지도"></div>
     <div class="endc" id="endc">
       <p style="margin:0 0 8px" data-i="confirmEnd">이번 달리기를 끝내고 기록을 저장할까요?</p>
@@ -1215,8 +1218,32 @@ const locErr=err=>err.code===1?t(location.protocol!=='https:'||window.self!==win
 const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
 function elapsed(){return run?run.acc+(run.paused?0:(Date.now()-run.t0)/1000):0}
 const VDUR=60,VPACE=330;
+let vMap=null,vBase,vGap,vDone,vRunner,vCities;
+function setupVMap(){
+  if(!vMap){
+    vMap=L.map('vMap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH,touchZoom:true,scrollWheelZoom:false});
+    vMap.attributionControl.setPrefix(false);
+    L.tileLayer(tileUrl,{maxZoom:19,attribution:tileAttr}).addTo(vMap);
+    vBase=L.polyline([],{color:'#14181d',weight:5,opacity:.85}).addTo(vMap);
+    vGap=L.polyline([],{color:'#14181d',weight:4,dashArray:'6 8',opacity:.85}).addTo(vMap);
+    vDone=L.polyline([],{color:'#e5483b',weight:6}).addTo(vMap);
+    vCities=L.layerGroup().addTo(vMap);
+    vRunner=L.circleMarker([0,0],{radius:9,color:'#fff',weight:3,fillColor:'#e5483b',fillOpacity:1}).addTo(vMap);
+  }
+  vCities.clearLayers();
+  C.stops.forEach(s=>vCities.addLayer(L.circleMarker([s.c.lat,s.c.lon],{radius:6,color:'#14181d',weight:2,fillColor:'#ffffff',fillOpacity:1}).bindTooltip(cn(s.c.n),{permanent:true,direction:'right',offset:[8,0],className:'lab'})));
+  const gapAt=new Set(C.gap),segs=[[]],gaps=[];
+  C.geo.forEach((p,i)=>{segs[segs.length-1].push(ll(p));if(gapAt.has(i)){gaps.push([ll(p),ll(C.geo[i+1])]);segs.push([])}});
+  vBase.setLatLngs(segs);vGap.setLatLngs(gaps);
+  vMap.setView(ll(at(C,Math.min(TOTAL,st.km)/TOTAL)),10,{animate:false});
+}
+function paintVMap(km){
+  if(!vMap)return;
+  const p=at(C,Math.min(TOTAL,km)/TOTAL),d=C.geo.slice(0,p.i).map(ll);d.push(ll(p));
+  vRunner.setLatLng(ll(p));vDone.setLatLngs(d);vMap.panTo(ll(p),{animate:false});
+}
 function paintRun(){
-  if(run.virtual)run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);
+  if(run.virtual){run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);paintVMap(st.km+run.m/1000)}
   const km=run.m/1000,sec=run.virtual?km*VPACE:elapsed();
   $('rKm').innerHTML=km.toFixed(2)+'<small>km</small>';
   $('rTime').textContent=fmtT(sec);
@@ -1246,14 +1273,14 @@ function startWatch(){
     $('rStatus').textContent=locErr(err);$('rStatus').className='rstatus'+(err.code===1?' err':'');
   },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
 }
-function openRun(virtual){
-  run={m:0,acc:0,t0:Date.now(),paused:false,track:[],virtual};last=null;
+function openRun(virtual,goal){
+  run={m:0,acc:0,t0:Date.now(),paused:false,track:[],virtual,goal:goal||0};last=null;
   $('runView').classList.add('show');document.body.style.overflow='hidden';
-  $('meBtn').style.display=virtual?'none':'';$('meMap').classList.toggle('show',false);setI('meBtn','meOpen');
+  $('meBtn').style.display=virtual?'none':'';$('vMap').classList.toggle('show',!!virtual);$('meMap').classList.toggle('show',false);setI('meBtn','meOpen');
   setI('pauseBtn','pause');$('endc').classList.remove('show');
   $('rStatus').textContent=t('locating');$('rStatus').className='rstatus';
   if(meTrack)meTrack.setLatLngs([]);
-  if(virtual){$('rStatus').textContent=t('vrunning');paintRun();wake();tick=setInterval(()=>{if(run&&!run.paused)paintRun()},100);return}
+  if(virtual){setupVMap();setTimeout(()=>{vMap.invalidateSize();vMap.setView(ll(at(C,st.km/TOTAL)),10,{animate:false})},30);$('rStatus').textContent=t('vrunning');paintRun();wake();tick=setInterval(()=>{if(run&&!run.paused)paintRun()},100);return}
   paintRun();wake();startWatch();
   tick=setInterval(()=>{if(run&&!run.paused)paintRun()},1000);
 }
@@ -1261,7 +1288,7 @@ $('startBtn').addEventListener('click',()=>openRun(false));
 $('vStartBtn').addEventListener('click',()=>{
   if(anim){cancelAnimationFrame(anim);anim=null;shown=st.km;paint(st.km);renderLists()}
   if(st.km>=TOTAL-1e-6){st.km=0;shown=0;paint(0);renderLists();$('newcard').classList.remove('show')}
-  openRun(true);run.goal=TOTAL-st.km;
+  openRun(true,TOTAL-st.km);
 });
 $('pauseBtn').addEventListener('click',()=>{
   if(!run)return;
