@@ -1296,7 +1296,7 @@ $('pauseBtn').addEventListener('click',()=>{
   if(run.paused){run.paused=false;run.t0=Date.now();setI('pauseBtn','pause');$('rStatus').textContent=t('resumed')}
   else{run.acc=elapsed();run.paused=true;last=null;setI('pauseBtn','resume');$('rStatus').textContent=t('paused')}
 });
-$('endBtn').addEventListener('click',()=>$('endc').classList.add('show'));
+$('endBtn').addEventListener('click',()=>finishRun());
 $('endNo').addEventListener('click',()=>$('endc').classList.remove('show'));
 $('endYes').addEventListener('click',()=>finishRun());
 function finishRun(){
