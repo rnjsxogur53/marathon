@@ -683,6 +683,7 @@ h1{font:400 clamp(30px,6vw,44px)/1.05 "Black Han Sans","Noto Sans JP",sans-serif
 h2{font-size:18px;margin:0 0 12px}
 .lede{color:var(--sub);margin:0 0 16px}
 .num{font-family:"Black Han Sans","Noto Sans JP",sans-serif;font-weight:400}
+#lmap.pinch{touch-action:pan-y!important}
 #lmap{height:min(58vh,520px);border-radius:18px;border:1px solid var(--line);background:#cfe5f7}
 .leaflet-tooltip.lab{background:rgba(255,255,255,.9);border:0;box-shadow:none;padding:0 5px;font:700 13px "Noto Sans KR",sans-serif;color:#14181d}
 .leaflet-tooltip.lab:before{display:none}
@@ -852,7 +853,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
 {
 const TOTAL=42.195;
 const CITIES=[
-  ['서울','S',37.5665,126.9780],['인천','S',37.4563,126.7052],['수원','S',37.2636,127.0286],['도라산역','S',37.8995,126.7083],
+  ['서울','S',37.5665,126.9780],['인천','S',37.4563,126.7052],['수원','S',37.2636,127.0286],['파주','S',37.7600,126.7800],['도라산역','S',37.8995,126.7083],
   ['춘천','S',37.8813,127.7298],['속초','S',38.2070,128.5918],['강릉','S',37.7519,128.8761],['청주','S',36.6424,127.4890],
   ['대전','S',36.3504,127.3845],['전주','S',35.8242,127.1480],['광주','S',35.1595,126.8526],['목포','S',34.8118,126.3922],
   ['대구','S',35.8714,128.6014],['포항','S',36.0190,129.3435],['울산','S',35.5384,129.3114],['부산','S',35.1796,129.0756],
@@ -953,7 +954,7 @@ ja:{
  errLost:'GPS信号を一時的に見失いました。走り続ければ再び受信します。',
  m_manual:'手入力',m_gps:'GPS',m_demo:'デモモード',m_recover:'GPS（保存の復元）',prevRun:'前回のランニング'
 }};
-const CITY_JA={'서울':'ソウル','인천':'仁川','수원':'水原','도라산역':'都羅山駅','춘천':'春川','속초':'束草','강릉':'江陵','청주':'清州','대전':'大田','전주':'全州','광주':'光州','목포':'木浦','대구':'大邱','포항':'浦項','울산':'蔚山','부산':'釜山','제주':'済州','개성':'開城','해주':'海州','사리원':'沙里院','남포':'南浦','평양':'平壌','원산':'元山','함흥':'咸興','신의주':'新義州','강계':'江界','혜산':'恵山','청진':'清津','나선':'羅先'};
+const CITY_JA={'서울':'ソウル','인천':'仁川','수원':'水原','파주':'坡州','도라산역':'都羅山駅','춘천':'春川','속초':'束草','강릉':'江陵','청주':'清州','대전':'大田','전주':'全州','광주':'光州','목포':'木浦','대구':'大邱','포항':'浦項','울산':'蔚山','부산':'釜山','제주':'済州','개성':'開城','해주':'海州','사리원':'沙里院','남포':'南浦','평양':'平壌','원산':'元山','함흥':'咸興','신의주':'新義州','강계':'江界','혜산':'恵山','청진':'清津','나선':'羅先'};
 const FACTS_JA={
  '서울':['ソウル駅の鉄道起点標識には、平壌まで260.7km、新義州まで496.0kmと書かれています。','ソウル市「내 손안에 서울」'],
  '도라산역':['駅には「南の最後の駅ではなく、北へ向かう最初の駅」という標識があります。','Wikipedia, DMZ Train'],
@@ -1036,10 +1037,30 @@ function at(R,f){
 
 
 /* 코스 지도 (하나뿐) */
-const map=L.map('lmap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH,scrollWheelZoom:false,doubleClickZoom:true,touchZoom:true}).setView([38.2,127.3],6);
+const map=L.map('lmap',{zoomControl:true,attributionControl:true,preferCanvas:true,dragging:!TOUCH,scrollWheelZoom:false,doubleClickZoom:true,touchZoom:!TOUCH,zoomSnap:0,zoomDelta:1}).setView([38.2,127.3],6);
 map.attributionControl.setPrefix(false);
 const WholeCtl=L.Control.extend({options:{position:'topleft'},onAdd(){const d=L.DomUtil.create('div','leaflet-bar');const a=L.DomUtil.create('a','wholebtn',d);a.href='#';a.id='wholeBtn';a.setAttribute('role','button');a.textContent=t('whole');a.title=t('whole');L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);fitRoute()});L.DomEvent.disableClickPropagation(d);return d}});
 new WholeCtl().addTo(map);
+/* 두 손가락 확대·축소 (휴대폰) — 한 손가락은 페이지 스크롤 */
+if(TOUCH){
+  const box=$('lmap');box.classList.add('pinch');
+  let g=null;
+  const mid=e=>{const r=box.getBoundingClientRect(),a=e.touches[0],b=e.touches[1];return L.point((a.clientX+b.clientX)/2-r.left,(a.clientY+b.clientY)/2-r.top)};
+  const dist=e=>{const a=e.touches[0],b=e.touches[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)};
+  box.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){e.preventDefault();const m=mid(e);g={d:dist(e),z:map.getZoom(),ll:map.containerPointToLatLng(m)}}
+  },{passive:false});
+  box.addEventListener('touchmove',e=>{
+    if(!g||e.touches.length<2)return;
+    e.preventDefault();
+    const z=Math.max(map.getMinZoom(),Math.min(18,g.z+Math.log2(dist(e)/g.d))),m=mid(e);
+    const c=map.project(g.ll,z).subtract(m).add(map.getSize().divideBy(2));
+    map.setView(map.unproject(c,z),z,{animate:false});
+  },{passive:false});
+  const endG=e=>{if(g&&e.touches.length<2)g=null};
+  box.addEventListener('touchend',endG);box.addEventListener('touchcancel',endG);
+  ['gesturestart','gesturechange'].forEach(n=>box.addEventListener(n,e=>e.preventDefault(),{passive:false}));
+}
 map.zoomControl.getContainer().querySelector('.leaflet-control-zoom-in').title=t('zoomIn');
 map.zoomControl.getContainer().querySelector('.leaflet-control-zoom-out').title=t('zoomOut');
 map.createPane('base');map.getPane('base').style.zIndex=150;
