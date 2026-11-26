@@ -710,6 +710,7 @@ button{padding:0 18px;background:var(--card);cursor:pointer}
 select,input{padding:0 12px;background:var(--bg);width:100%}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .go{background:var(--run);border-color:var(--run);color:#fff;width:100%;font-size:19px;min-height:56px;margin-top:14px}
+.go2{background:transparent;border:1.5px solid var(--run);color:var(--run);width:100%;font-size:17px;min-height:52px;margin-top:10px}
 .pri{background:var(--sky);border-color:var(--sky);color:#fff}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:end}
 .row>*{flex:1 1 120px}
@@ -781,6 +782,7 @@ details summary{cursor:pointer;font-weight:500;min-height:44px;display:flex;alig
   </div>
   <div class="bar" aria-hidden="true"><i id="bar"></i></div>
   <button class="go" id="startBtn" data-i="start">달리기 시작</button>
+  <button class="go2" id="vStartBtn" data-i="vstart">가상 달리기 시작</button>
   <p class="status" id="status" aria-live="polite"></p>
 
   <div class="panel">
@@ -889,7 +891,7 @@ const I18N={
 ko:{
  title:'가상 통일 마라톤',
  lede:'어디서든 달리면, 달린 거리만큼 서울–평양 코스 위를 전진해요. 코스 전체는 마라톤 거리 42.195km로 줄여 놓았어요.',
- mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',
+ mapAria:'마라톤 코스 지도',ran:'달린 거리',nextCity:'다음 도시까지',start:'달리기 시작',vstart:'가상 달리기 시작',vrunning:'가상 달리기 중 · 1분 뒤 자동으로 완주해요',m_virtual:'가상 달리기',
  addRec:'기록 더하기',manualAria:'직접 입력할 거리(km)',addKm:'거리 추가',demo:'시연 모드',
  pickCourse:'코스 고르기',from:'출발',to:'도착',swapAria:'출발과 도착 바꾸기',
  setRoute:'이 코스로 마라톤 시작',curRoute:'지금 달리는 코스예요',
@@ -923,7 +925,7 @@ ko:{
 ja:{
  title:'バーチャル統一マラソン',
  lede:'どこで走っても、走った距離だけソウル–平壌のコースを進みます。コース全体はマラソンの距離42.195kmに縮めてあります。',
- mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',
+ mapAria:'マラソンコースの地図',ran:'走った距離',nextCity:'次の都市まで',start:'ランニング開始',vstart:'バーチャルランを開始',vrunning:'バーチャルラン中 · 1分後に自動で完走します',m_virtual:'バーチャルラン',
  addRec:'記録を追加',manualAria:'入力する距離（km）',addKm:'距離を追加',demo:'デモモード',
  pickCourse:'コースを選ぶ',from:'出発',to:'到着',swapAria:'出発と到着を入れ替える',
  setRoute:'このコースでスタート',curRoute:'現在のコースです',
@@ -1096,7 +1098,7 @@ function drawRoute(){
   routeGap.setLatLngs(gaps);
   routeDone.setStyle({opacity:preview?0:1});runner.setStyle({opacity:preview?0:1,fillOpacity:preview?0:1});
 }
-function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{padding:[28,28]})}
+function fitRoute(){map.fitBounds(L.latLngBounds(P.geo.map(ll)),{paddingTopLeft:[58,24],paddingBottomRight:[64,24]})}
 window.addEventListener('resize',()=>{clearTimeout(fitRoute.t);fitRoute.t=setTimeout(fitRoute,200)});
 
 function updatePick(){
@@ -1212,14 +1214,17 @@ async function wake(){try{if('wakeLock'in navigator)lock=await navigator.wakeLoc
 const locErr=err=>err.code===1?t(location.protocol!=='https:'||window.self!==window.top?'errHttps':'errPerm'):t('errLost');
 const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
 function elapsed(){return run?run.acc+(run.paused?0:(Date.now()-run.t0)/1000):0}
+const VDUR=60,VPACE=330;
 function paintRun(){
-  const km=run.m/1000,sec=elapsed();
+  if(run.virtual)run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);
+  const km=run.m/1000,sec=run.virtual?km*VPACE:elapsed();
   $('rKm').innerHTML=km.toFixed(2)+'<small>km</small>';
   $('rTime').textContent=fmtT(sec);
-  if(km>=0.05){const pace=sec/km;$('rPace').textContent=`${Math.floor(pace/60)}'${String(Math.round(pace%60)).padStart(2,'0')}"`}else $('rPace').textContent=`-'--"`;
+  if(km>=0.05){const pace=run.virtual?VPACE:sec/km;$('rPace').textContent=`${Math.floor(pace/60)}'${String(Math.round(pace%60)).padStart(2,'0')}"`}else $('rPace').textContent=`-'--"`;
   const now=Math.min(TOTAL,st.km+km),nx=C.stops.find(s=>s.km>now+1e-9);
   $('rNote').textContent=t('rNote',{r:(km*C.scale).toFixed(1)})+(nx?t('rNext',{c:cn(nx.c.n),k:(nx.km-now).toFixed(1)}):t('rDone'));
-  st.run={m:run.m};save();
+  if(!run.virtual){st.run={m:run.m};save()}
+  else if(elapsed()>=VDUR&&!run.done){run.done=true;finishRun()}
 }
 function startWatch(){
   if(!('geolocation'in navigator)){$('rStatus').textContent=t('noGeo');$('rStatus').className='rstatus err';return}
@@ -1241,14 +1246,22 @@ function startWatch(){
     $('rStatus').textContent=locErr(err);$('rStatus').className='rstatus'+(err.code===1?' err':'');
   },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
 }
-$('startBtn').addEventListener('click',()=>{
-  run={m:0,acc:0,t0:Date.now(),paused:false,track:[]};last=null;
+function openRun(virtual){
+  run={m:0,acc:0,t0:Date.now(),paused:false,track:[],virtual};last=null;
   $('runView').classList.add('show');document.body.style.overflow='hidden';
+  $('meBtn').style.display=virtual?'none':'';$('meMap').classList.toggle('show',false);setI('meBtn','meOpen');
   setI('pauseBtn','pause');$('endc').classList.remove('show');
   $('rStatus').textContent=t('locating');$('rStatus').className='rstatus';
   if(meTrack)meTrack.setLatLngs([]);
+  if(virtual){$('rStatus').textContent=t('vrunning');paintRun();wake();tick=setInterval(()=>{if(run&&!run.paused)paintRun()},100);return}
   paintRun();wake();startWatch();
   tick=setInterval(()=>{if(run&&!run.paused)paintRun()},1000);
+}
+$('startBtn').addEventListener('click',()=>openRun(false));
+$('vStartBtn').addEventListener('click',()=>{
+  if(anim){cancelAnimationFrame(anim);anim=null;shown=st.km;paint(st.km);renderLists()}
+  if(st.km>=TOTAL-1e-6){st.km=0;shown=0;paint(0);renderLists();$('newcard').classList.remove('show')}
+  openRun(true);run.goal=TOTAL-st.km;
 });
 $('pauseBtn').addEventListener('click',()=>{
   if(!run)return;
@@ -1257,14 +1270,17 @@ $('pauseBtn').addEventListener('click',()=>{
 });
 $('endBtn').addEventListener('click',()=>$('endc').classList.add('show'));
 $('endNo').addEventListener('click',()=>$('endc').classList.remove('show'));
-$('endYes').addEventListener('click',()=>{
+$('endYes').addEventListener('click',()=>finishRun());
+function finishRun(){
+  if(!run)return;
   if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(tick);
   try{lock&&lock.release()}catch(e){}lock=null;
-  const km=run.m/1000;run=null;st.run=null;save();
+  const virtual=run.virtual;if(virtual)run.m=run.goal*1000*Math.min(1,elapsed()/VDUR);
+  const km=run.m/1000;run=null;st.run=null;save();$('endc').classList.remove('show');
   $('runView').classList.remove('show');document.body.style.overflow='';
   window.scrollTo({top:0});
-  setTimeout(()=>{map.invalidateSize();if(km>=0.01)advance(km,'gps');else{$('adv').textContent=t('tooShort');fitRoute()}},250);
-});
+  setTimeout(()=>{map.invalidateSize();if(km>=0.01)advance(km,virtual?'virtual':'gps');else{$('adv').textContent=t('tooShort');fitRoute()}},250);
+}
 $('meBtn').addEventListener('click',()=>{
   const box=$('meMap'),open=!box.classList.contains('show');
   box.classList.toggle('show',open);setI('meBtn',open?'meClose':'meOpen');
