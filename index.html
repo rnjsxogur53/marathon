@@ -689,9 +689,11 @@ h2{font-size:18px;margin:0 0 12px}
 .mapctl{position:absolute;right:10px;top:10px;z-index:1000;display:flex;gap:6px}
 .mapctl button{min-height:44px;padding:0 14px;background:#fff;color:#14181d;font-size:15px;border:1px solid #cfd6de}
 .mapctl button.on{background:#14181d;color:#fff;border-color:#14181d}
-.mapinfo{position:absolute;left:10px;bottom:30px;z-index:1000;font-size:13px;background:rgba(255,255,255,.92);color:#14181d;padding:4px 10px;border-radius:8px;max-width:calc(100% - 20px)}
+.mapinfo{position:absolute;left:10px;bottom:22px;z-index:1000;font-size:13px;background:rgba(255,255,255,.92);color:#14181d;padding:4px 10px;border-radius:8px;max-width:calc(100% - 20px)}
 .leaflet-tooltip.lab{background:rgba(255,255,255,.9);border:0;box-shadow:none;padding:0 5px;font:700 13px "Noto Sans KR",sans-serif;color:#14181d}
 .leaflet-tooltip.lab:before{display:none}
+.leaflet-container .leaflet-control-attribution{background:transparent;font-size:10px;line-height:1.2;padding:0 4px;opacity:.65;box-shadow:none}
+.leaflet-control-attribution a{color:#14181d}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
 .stat{background:var(--card);border-radius:12px;padding:10px 12px}
 .stat b{display:block;font:400 22px/1.2 "Black Han Sans",sans-serif;white-space:nowrap}
@@ -743,7 +745,7 @@ label{font-size:13px;color:var(--sub);display:block}
     <section>
       <div class="mapwrap">
         <div id="lmap" aria-label="한반도 지도와 선택한 마라톤 코스"></div>
-        <div class="mapctl"><button id="whole">전체 코스</button><button id="follow">따라가기</button></div>
+        <div class="mapctl"><button id="whole">전체</button><button id="follow">코스 따라가기</button><button id="locate">내 위치</button></div>
         <div class="mapinfo" id="mapinfo">지도 불러오는 중</div>
       </div>
       <div class="stats">
@@ -903,11 +905,12 @@ function at(R,f){
 
 /* 지도 */
 const map=L.map('lmap',{zoomControl:true,attributionControl:true,preferCanvas:true}).setView([38.2,127.3],6);
+map.attributionControl.setPrefix(false);
 map.createPane('base');map.getPane('base').style.zIndex=150;
 const ll=p=>[p.lat,p.lon];
 ['S','N'].forEach(k=>OUT[k].forEach(r=>L.polygon(r.map(([x,y])=>[y,x]),{pane:'base',color:'#ffffff',weight:1,fillColor:'#9fcaf0',fillOpacity:1}).addTo(map)));
 let tilesOK=false,tileErr=0;
-const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap 기여자'}).addTo(map);
+const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>'}).addTo(map);
 tiles.on('tileload',()=>{if(!tilesOK){tilesOK=true;info()}});
 tiles.on('tileerror',()=>{tileErr++;if(!tilesOK&&tileErr===3)info()});
 const routeBase=L.polyline([],{color:'#14181d',weight:5,opacity:.85}).addTo(map);
@@ -915,12 +918,25 @@ const routeGap=L.polyline([],{color:'#14181d',weight:4,dashArray:'6 8',opacity:.
 const routeDone=L.polyline([],{color:'#e5483b',weight:6}).addTo(map);
 const runner=L.circleMarker([0,0],{radius:9,color:'#fff',weight:3,fillColor:'#e5483b',fillOpacity:1}).addTo(map);
 const cityLayer=L.layerGroup().addTo(map);
-let follow=false;
+let follow=false,meMode=false,mePos=null;
+const meTrack=L.polyline([],{color:'#2f7fe0',weight:5,opacity:.9}).addTo(map);
+const meAcc=L.circle([0,0],{radius:1,color:'#2f7fe0',weight:1,fillColor:'#2f7fe0',fillOpacity:.12,opacity:0});
+const meDot=L.circleMarker([0,0],{radius:8,color:'#fff',weight:3,fillColor:'#2f7fe0',fillOpacity:1});
+function showMe(lat,lon,acc){
+  mePos=[lat,lon];
+  if(!map.hasLayer(meDot)){meAcc.addTo(map);meDot.addTo(map);mePos&&info()}
+  meDot.setLatLng(mePos);meAcc.setLatLng(mePos).setRadius(acc||10);meAcc.setStyle({opacity:.5});
+  if(meMode)map.panTo(mePos,{animate:false});
+}
+function setMode(m){
+  follow=m==='follow';meMode=m==='me';
+  $('follow').classList.toggle('on',follow);$('locate').classList.toggle('on',meMode);
+}
 
 function info(){
   const R=C;const parts=[];
   if(tilesOK)parts.push('실제 지도');else if(tileErr>=3)parts.push('지도 그림을 못 불러왔어요 (배포한 주소에서 열어 주세요)');else parts.push('지도 불러오는 중');
-  parts.push(R.src==='osrm'?'경로: 실제 도로':'경로: 간이 도로망');
+  parts.push(R.src==='osrm'?'경로: 실제 도로':'경로: 간이 도로망');if(mePos)parts.push('파란 점: 내 위치');
   $('mapinfo').textContent=parts.join(' · ');
 }
 
@@ -986,8 +1002,19 @@ $('setRoute').addEventListener('click',()=>{
 });
 $('yes2').addEventListener('click',()=>{$('confirm2').classList.remove('show');applyRoute()});
 $('no2').addEventListener('click',()=>$('confirm2').classList.remove('show'));
-$('whole').addEventListener('click',()=>{follow=false;$('follow').classList.remove('on');fitRoute()});
-$('follow').addEventListener('click',()=>{follow=!follow;$('follow').classList.toggle('on',follow);if(follow){map.setView(ll(at(C,Math.min(st.km,TOTAL)/TOTAL)),Math.max(map.getZoom(),14))}});
+$('whole').addEventListener('click',()=>{setMode('none');fitRoute()});
+$('follow').addEventListener('click',()=>{setMode(follow?'none':'follow');if(follow){map.setView(ll(at(C,Math.min(st.km,TOTAL)/TOTAL)),Math.max(map.getZoom(),14))}});
+const locErr=err=>err.code===1?(location.protocol!=='https:'||window.self!==window.top?'이 화면에서는 위치를 쓸 수 없어요. 배포한 주소(HTTPS)에서 열어 주세요.':'위치 권한이 꺼져 있어요. 아이폰은 설정 > 개인정보 보호 및 보안 > 위치 서비스에서 지금 쓰는 브라우저(Safari 또는 Chrome)를 "앱을 사용하는 동안"으로 바꾸고, 정확한 위치를 켠 뒤 페이지를 새로고침해 주세요.'):'위치를 가져오지 못했어요. 하늘이 트인 곳에서 다시 시도해 주세요.';
+$('locate').addEventListener('click',()=>{
+  if(meMode){setMode('none');return}
+  setMode('me');
+  if(mePos){map.setView(mePos,Math.max(map.getZoom(),16));return}
+  if(!('geolocation'in navigator)){setMode('none');toast('이 브라우저는 위치를 지원하지 않아요');return}
+  toast('내 위치를 찾는 중이에요');
+  navigator.geolocation.getCurrentPosition(pos=>{const c=pos.coords;showMe(c.latitude,c.longitude,c.accuracy);map.setView(mePos,16)},
+    err=>{setMode('none');$('status').textContent=locErr(err);$('status').className='status err';toast('위치를 가져오지 못했어요')},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+});
 
 let opened=new Set(C.stops.filter(s=>s.km<=st.km+1e-9).map(s=>s.c.n));
 let crossed=C.cross!==null&&st.km/TOTAL>=C.cross;
@@ -1044,23 +1071,25 @@ function stopGps(){
 $('gps').addEventListener('click',()=>{
   if(watch!==null){stopGps();$('status').textContent='달리기를 마쳤어요. 기록을 저장했어요.';$('status').className='status';return}
   if(!('geolocation'in navigator)){$('status').textContent='이 브라우저는 위치를 지원하지 않아요. 거리 직접 입력을 써 주세요.';$('status').className='status err';return}
-  runM=0;last=null;wake();
+  runM=0;last=null;wake();setMode('me');if(mePos)map.setView(mePos,Math.max(map.getZoom(),16));
   $('gps').textContent='달리기 끝내기';$('gps').classList.add('on');
   $('status').textContent='위치를 찾는 중이에요...';$('status').className='status';
   watch=navigator.geolocation.watchPosition(pos=>{
     const c=pos.coords,now={lat:c.latitude,lon:c.longitude,t:pos.timestamp};
+    showMe(c.latitude,c.longitude,c.accuracy);
     if(c.accuracy>30){$('status').textContent=`GPS 신호가 약해요 (오차 ${Math.round(c.accuracy)}m). 하늘이 트인 곳으로 가 주세요.`;return}
     if(last){
       const d=hm(last,now),dt=(now.t-last.t)/1000;
       if(d<3)return;
       if(dt>0&&d/dt>7){last=now;return}
-      runM+=d;st.km=Math.min(TOTAL,st.km+d/1000);render();
+      runM+=d;meTrack.addLatLng([now.lat,now.lon]);st.km=Math.min(TOTAL,st.km+d/1000);render();
     }
+    if(!last)meTrack.setLatLngs([[now.lat,now.lon]]);
     last=now;
     $('status').textContent=`달리는 중: 이번에 ${(runM/1000).toFixed(2)}km`;
   },err=>{
-    const m=err.code===1?'위치 권한이 막혀 있어요. 미리보기 화면에서는 GPS가 동작하지 않으니, 배포한 주소(HTTPS)에서 열어 주세요.':'위치를 가져오지 못했어요. 잠시 후 다시 시도해 주세요.';
-    stopGps();$('status').textContent=m;$('status').className='status err';
+    if(err.code!==1){$('status').textContent='GPS 신호를 잠깐 놓쳤어요. 계속 달리면 다시 잡혀요.';return}
+    stopGps();$('status').textContent=locErr(err);$('status').className='status err';
   },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
 });
 document.addEventListener('visibilitychange',()=>{if(watch!==null&&document.visibilityState==='visible')wake()});
@@ -1070,7 +1099,7 @@ $('demo').addEventListener('click',()=>{
   if(demoT){clearInterval(demoT);demoT=null;$('demo').textContent='시연 모드';return}
   if(st.km>=TOTAL){st.km=0;opened=new Set([st.a]);crossed=false}
   const start=st.km;$('demo').textContent='시연 멈추기';
-  follow=true;$('follow').classList.add('on');
+  setMode('follow');
   map.setView(ll(at(C,st.km/TOTAL)),Math.max(map.getZoom(),13),{animate:false});
   document.querySelector('.mapwrap').scrollIntoView({behavior:'smooth',block:'start'});
   demoT=setInterval(()=>{
